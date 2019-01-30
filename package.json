@@ -1,0 +1,44 @@
+{
+  "name": "@graphile/global-ids",
+  "version": "0.0.1",
+  "description": "Expands PostGraphile support for global object IDs",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "concurrently --kill-others 'yarn db:watch' 'yarn build:watch' 'yarn postgraphile:watch'",
+    "postgraphile": "postgraphile -c global-ids -s app_public --watch --enhance-graphiql --export-schema-graphql schema.graphql",
+    "postgraphile:watch": "nodemon --watch src -x 'yarn postgraphile'",
+    "db": "psql -1Xv ON_ERROR_STOP=1 -f schema.sql global-ids",
+    "db:watch": "echo schema.sql | entr -rc psql -1Xv ON_ERROR_STOP=1 -f /_ global-ids",
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "test": "jest",
+    "tslint": "prettier --list-different 'src/**/*' && tslint --config tslint.json --project tsconfig.json",
+    "createdb": "createdb global-ids"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/graphile/global-ids.git"
+  },
+  "keywords": [
+    "PostGraphile",
+    "plugin",
+    "relay"
+  ],
+  "author": "Benjie Gillam <code@benjiegillam.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/graphile/global-ids/issues"
+  },
+  "homepage": "https://github.com/graphile/global-ids#readme",
+  "devDependencies": {
+    "concurrently": "^4.1.0",
+    "jest": "^24.0.0",
+    "nodemon": "^1.18.9",
+    "postgraphile": "^4.3.2",
+    "prettier": "^1.16.2",
+    "typescript": "^3.2.4"
+  },
+  "files": [
+    "dist"
+  ]
+}
