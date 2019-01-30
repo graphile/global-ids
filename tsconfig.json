@@ -13,13 +13,14 @@
     "pretty": true,
     "importHelpers": true,
     "experimentalDecorators": true,
-    "noImplicitAny": true,
     "suppressImplicitAnyIndexErrors": true,
-    "strictNullChecks": true,
     "noFallthroughCasesInSwitch": true,
     "noUnusedParameters": true,
     "noUnusedLocals": true,
     "preserveWatchOutput": true,
-    "lib": ["es2018", "esnext.asynciterable"]
+    "lib": ["es2018", "esnext.asynciterable"],
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": true,
+    "strict": true
   }
 }
