@@ -9,9 +9,10 @@
     "postgraphile:watch": "nodemon --watch src -x 'yarn postgraphile'",
     "db": "psql -1Xv ON_ERROR_STOP=1 -f schema.sql global-ids",
     "db:watch": "echo schema.sql | entr -rc psql -1Xv ON_ERROR_STOP=1 -f /_ global-ids",
+    "testdb": "psql -1Xv ON_ERROR_STOP=1 -f src/__tests__/schema.sql \"${TEST_DATABASE_URL:-pggql_test}\"",
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "test": "jest",
+    "test": "npm run testdb && jest",
     "tslint": "prettier --list-different 'src/**/*' && tslint --config tslint.json --project tsconfig.json",
     "createdb": "createdb global-ids"
   },
@@ -31,11 +32,13 @@
   },
   "homepage": "https://github.com/graphile/global-ids#readme",
   "devDependencies": {
+    "@types/jest": "^24.0.0",
     "concurrently": "^4.1.0",
     "jest": "^24.0.0",
     "nodemon": "^1.18.9",
     "postgraphile": "^4.3.2",
     "prettier": "^1.16.2",
+    "ts-jest": "^23.10.5",
     "typescript": "^3.2.4"
   },
   "files": [
