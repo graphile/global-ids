@@ -45,9 +45,9 @@ test("Schema matches snapshot", async () => {
   expect(printSchema(schema)).toMatchSnapshot();
 });
 
-test("Can run regular insert and update mutations", async () => {
-  const { data, errors } = await withContext(context =>
-    graphql(
+test("Can run regular insert and update mutations", () =>
+  withContext(async context => {
+    const createResult = await graphql(
       schema,
       `
         mutation {
@@ -79,17 +79,16 @@ test("Can run regular insert and update mutations", async () => {
       context,
       {},
       null
-    )
-  );
-  expect(errors).toBeFalsy();
-  const {
-    createItem: { item },
-  } = data;
-  const { id, ...restOfItem } = item;
-  expect(restOfItem).toMatchInlineSnapshot(`
+    );
+    expect(createResult.errors).toBeFalsy();
+    expect(createResult.data).toBeTruthy();
+    const {
+      createItem: { item },
+    } = createResult.data!;
+    const { id, nodeId, ...restOfItem } = item;
+    expect(restOfItem).toMatchInlineSnapshot(`
 Object {
   "label": "Something",
-  "nodeId": "WyJpdGVtcyIsMV0=",
   "personByPersonOrganizationIdAndPersonIdentifier": Object {
     "identifier": "2",
     "nodeId": "WyJwZW9wbGUiLDIsIjIiXQ==",
@@ -99,8 +98,60 @@ Object {
   "personOrganizationId": 2,
 }
 `);
-});
+
+    const updateResult = await graphql(
+      schema,
+      `
+        mutation($nodeId: ID!) {
+          updateItem(
+            input: { nodeId: $nodeId, itemPatch: { label: "Gadget" } }
+          ) {
+            item {
+              nodeId
+              id
+              personByPersonOrganizationIdAndPersonIdentifier {
+                nodeId
+                organizationId
+                identifier
+              }
+              personOrganizationId
+              personIdentifier
+              label
+            }
+          }
+        }
+      `,
+      null,
+      context,
+      { nodeId },
+      null
+    );
+    expect(updateResult.errors).toBeFalsy();
+    expect(updateResult.data).toBeTruthy();
+    const {
+      updateItem: { item: updatedItem },
+    } = updateResult.data!;
+    const {
+      id: updatedId,
+      nodeId: updatedNodeId,
+      ...restOfUpdatedItem
+    } = updatedItem;
+    expect(restOfUpdatedItem).toMatchInlineSnapshot(`
+Object {
+  "label": "Gadget",
+  "personByPersonOrganizationIdAndPersonIdentifier": Object {
+    "identifier": "2",
+    "nodeId": "WyJwZW9wbGUiLDIsIjIiXQ==",
+    "organizationId": 2,
+  },
+  "personIdentifier": "2",
+  "personOrganizationId": 2,
+}
+`);
+  }));
+
 test.todo("Can run nodeId insert and update mutations");
+
 test.todo(
   "Get an error from insert if neither fields nor node ID are specified"
 );
