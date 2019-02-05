@@ -62,6 +62,55 @@ const GlobalIdExtensionsPlugin: Plugin = function(builder) {
       return field;
     }
   );
+  builder.hook("GraphQLInputObjectType:fields", (fields, build, context) => {
+    const {
+      extend,
+      graphql: { GraphQLID },
+      inflection,
+    } = build;
+    const {
+      scope: {
+        isPgRowType,
+        isInputType,
+        isPgPatch,
+        isPgBaseInput,
+        pgIntrospection,
+      },
+      fieldWithHooks,
+    } = context;
+
+    if (
+      !isPgRowType ||
+      !(isInputType || isPgPatch || isPgBaseInput) ||
+      pgIntrospection.kind !== "class"
+    ) {
+      return fields;
+    }
+    const table: PgClass = pgIntrospection;
+    const foreignKeys = table.constraints.filter(isForeignKey);
+    return foreignKeys.reduce((memo, fk) => {
+      // @ts-ignore
+      const foreignTable: PgClass = fk.foreignClass;
+      const fieldName = inflection.singleRelationByKeys(
+        fk.keyAttributes,
+        foreignTable,
+        table,
+        fk
+      );
+      return extend(memo, {
+        [fieldName]: fieldWithHooks(
+          fieldName,
+          {
+            type: GraphQLID,
+          },
+          {
+            pgFieldIntrospection: fk,
+            isPgForeignKeyNodeIdField: true,
+          }
+        ),
+      });
+    }, fields);
+  });
 };
 
 export default GlobalIdExtensionsPlugin;
