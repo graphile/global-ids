@@ -312,10 +312,11 @@ input ItemCondition {
 \\"\\"\\"An input for mutations affecting \`Item\`\\"\\"\\"
 input ItemInput {
   id: Int
-  personOrganizationId: Int!
-  personIdentifier: String!
+  personOrganizationId: Int
+  personIdentifier: String
   label: String!
   createdAt: Datetime
+  personByPersonOrganizationIdAndPersonIdentifier: ID
 }
 
 \\"\\"\\"
@@ -327,6 +328,7 @@ input ItemPatch {
   personIdentifier: String
   label: String
   createdAt: Datetime
+  personByPersonOrganizationIdAndPersonIdentifier: ID
 }
 
 \\"\\"\\"A connection to a list of \`Item\` values.\\"\\"\\"
@@ -734,10 +736,11 @@ input PersonCondition {
 
 \\"\\"\\"An input for mutations affecting \`Person\`\\"\\"\\"
 input PersonInput {
-  organizationId: Int!
+  organizationId: Int
   identifier: String!
   name: String!
   createdAt: Datetime
+  organizationByOrganizationId: ID
 }
 
 \\"\\"\\"
@@ -748,6 +751,7 @@ input PersonPatch {
   identifier: String
   name: String
   createdAt: Datetime
+  organizationByOrganizationId: ID
 }
 
 \\"\\"\\"The root query type which gives access points into the data universe.\\"\\"\\"
