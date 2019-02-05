@@ -295,9 +295,105 @@ Array [
 `);
   }));
 
-test.todo(
-  "Get an error from insert if both are specified and they don't agree"
-);
+test("Get an error from insert if both are specified and they don't agree", () =>
+  withContext(async context => {
+    const createResult = await graphql(
+      schema,
+      `
+        mutation {
+          createItem(
+            input: {
+              item: {
+                label: "Something"
+                personByPersonOrganizationIdAndPersonIdentifier: "WyJwZW9wbGUiLDIsIjIiXQ=="
+                personOrganizationId: 2
+                personIdentifier: "3" # Disagrees with above nodeId
+              }
+            }
+          ) {
+            item {
+              nodeId
+              id
+              personByPersonOrganizationIdAndPersonIdentifier {
+                nodeId
+                organizationId
+                identifier
+              }
+              personOrganizationId
+              personIdentifier
+              label
+            }
+          }
+        }
+      `,
+      null,
+      context,
+      {},
+      null
+    );
+    expect(createResult.errors).toBeTruthy();
+    expect(createResult.errors).toMatchInlineSnapshot(`
+Array [
+  [GraphQLError: Cannot specify the individual keys and the relation nodeId with different values.],
+]
+`);
+  }));
+
+test("No error from insert if both are specified and they do agree", () =>
+  withContext(async context => {
+    const createResult = await graphql(
+      schema,
+      `
+        mutation {
+          createItem(
+            input: {
+              item: {
+                label: "Something"
+                personByPersonOrganizationIdAndPersonIdentifier: "WyJwZW9wbGUiLDIsIjIiXQ=="
+                personOrganizationId: 2
+                personIdentifier: "2" # Agrees with above nodeId
+              }
+            }
+          ) {
+            item {
+              nodeId
+              id
+              personByPersonOrganizationIdAndPersonIdentifier {
+                nodeId
+                organizationId
+                identifier
+              }
+              personOrganizationId
+              personIdentifier
+              label
+            }
+          }
+        }
+      `,
+      null,
+      context,
+      {},
+      null
+    );
+    expect(createResult.errors).toBeFalsy();
+    expect(createResult.data).toBeTruthy();
+    const {
+      createItem: { item },
+    } = createResult.data!;
+    const { id, nodeId, ...restOfItem } = item;
+    expect(restOfItem).toMatchInlineSnapshot(`
+Object {
+  "label": "Something",
+  "personByPersonOrganizationIdAndPersonIdentifier": Object {
+    "identifier": "2",
+    "nodeId": "WyJwZW9wbGUiLDIsIjIiXQ==",
+    "organizationId": 2,
+  },
+  "personIdentifier": "2",
+  "personOrganizationId": 2,
+}
+`);
+  }));
 
 test.todo(
   "Get an error from update if both are specified and they don't agree"
