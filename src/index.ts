@@ -125,27 +125,96 @@ const GlobalIdExtensionsTweakFieldsPlugin: Plugin = function(builder) {
 const GlobalIdExtensionsPlugin = makePluginByCombiningPlugins(
   GlobalIdExtensionsTweakFieldsPlugin,
   makeWrapResolversPlugin(
-    (context, _build, _field, _options) => {
+    (context, build, _field, _options) => {
       const {
-        scope: { isRootMutation, pgIntrospection },
+        scope: {
+          isRootMutation,
+          pgFieldIntrospection,
+          isPgCreateMutationField,
+          isPgUpdateMutationField,
+        },
       } = context;
+      const {
+        inflection,
+        getTypeAndIdentifiersFromNodeId,
+        pgGetGqlTypeByTypeIdAndModifier,
+      } = build;
       if (
         !isRootMutation ||
-        !pgIntrospection ||
-        pgIntrospection.kind !== "class"
+        !pgFieldIntrospection ||
+        !(isPgCreateMutationField || isPgUpdateMutationField) ||
+        pgFieldIntrospection.kind !== "class"
       ) {
         return null;
       }
-      const table: PgClass = pgIntrospection;
+      const table: PgClass = pgFieldIntrospection;
+      const inputOrPatchFieldName = isPgCreateMutationField
+        ? inflection.tableFieldName(table)
+        : inflection.patchField(inflection.tableFieldName(table));
       return {
         table,
+        inflection,
+        getTypeAndIdentifiersFromNodeId,
+        pgGetGqlTypeByTypeIdAndModifier,
+        inputOrPatchFieldName,
       };
     },
-    ({ table }) => (resolver, parent, args, context, resolveInfo) => {
+    ({
+      table,
+      inflection,
+      getTypeAndIdentifiersFromNodeId,
+      pgGetGqlTypeByTypeIdAndModifier,
+      inputOrPatchFieldName,
+    }) => (resolver, parent, args, context, resolveInfo) => {
+      // TODO: move as much of this logic into the filter as we can so we can
+      // avoid runtime inflection, type lookup, etc
+      const obj = {
+        ...args.input[inputOrPatchFieldName],
+      };
       const newArgs = {
         ...args,
+        input: {
+          ...args.input,
+          [inputOrPatchFieldName]: obj,
+        },
       };
-      table;
+      const foreignKeys = table.constraints.filter(isForeignKey);
+      for (const fk of foreignKeys) {
+        // @ts-ignore
+        const foreignTable: PgClass = fk.foreignClass;
+        const TableType = pgGetGqlTypeByTypeIdAndModifier(
+          foreignTable.type.id,
+          null
+        );
+        const fieldName = inflection.singleRelationByKeys(
+          fk.keyAttributes,
+          foreignTable,
+          table,
+          fk
+        );
+        if (obj[fieldName]) {
+          const nodeId = obj[fieldName];
+          const { Type, identifiers } = getTypeAndIdentifiersFromNodeId(nodeId);
+          if (Type !== TableType) {
+            return null;
+          }
+          fk.keyAttributes.forEach((attr, i) => {
+            const keyFieldName = inflection.column(attr);
+            const value = identifiers[i];
+            if (
+              obj[keyFieldName] !== undefined &&
+              obj[keyFieldName] !== value
+            ) {
+              throw new Error(
+                "Cannot specify the individual keys and the relation nodeId with different values."
+              );
+            }
+            obj[keyFieldName] = value;
+          });
+          // We're no longer used, so clean us up
+          delete obj[fieldName];
+        }
+      }
       return resolver(parent, newArgs, context, resolveInfo);
     }
   )

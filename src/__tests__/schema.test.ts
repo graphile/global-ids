@@ -150,7 +150,115 @@ Object {
 `);
   }));
 
-test.todo("Can run nodeId insert and update mutations");
+test("Can run nodeId insert and update mutations", () =>
+  withContext(async context => {
+    const createResult = await graphql(
+      schema,
+      `
+        mutation {
+          createItem(
+            input: {
+              item: {
+                personByPersonOrganizationIdAndPersonIdentifier: "WyJwZW9wbGUiLDIsIjIiXQ=="
+                label: "Something"
+              }
+            }
+          ) {
+            item {
+              nodeId
+              id
+              personByPersonOrganizationIdAndPersonIdentifier {
+                nodeId
+                organizationId
+                identifier
+              }
+              personOrganizationId
+              personIdentifier
+              label
+            }
+          }
+        }
+      `,
+      null,
+      context,
+      {},
+      null
+    );
+    expect(createResult.errors).toBeFalsy();
+    expect(createResult.data).toBeTruthy();
+    const {
+      createItem: { item },
+    } = createResult.data!;
+    const { id, nodeId, ...restOfItem } = item;
+    expect(restOfItem).toMatchInlineSnapshot(`
+Object {
+  "label": "Something",
+  "personByPersonOrganizationIdAndPersonIdentifier": Object {
+    "identifier": "2",
+    "nodeId": "WyJwZW9wbGUiLDIsIjIiXQ==",
+    "organizationId": 2,
+  },
+  "personIdentifier": "2",
+  "personOrganizationId": 2,
+}
+`);
+
+    const updateResult = await graphql(
+      schema,
+      `
+        mutation($nodeId: ID!) {
+          updateItem(
+            input: {
+              nodeId: $nodeId
+              itemPatch: {
+                label: "Gadget"
+                personByPersonOrganizationIdAndPersonIdentifier: "WyJwZW9wbGUiLDIsIjMiXQ=="
+              }
+            }
+          ) {
+            item {
+              nodeId
+              id
+              personByPersonOrganizationIdAndPersonIdentifier {
+                nodeId
+                organizationId
+                identifier
+              }
+              personOrganizationId
+              personIdentifier
+              label
+            }
+          }
+        }
+      `,
+      null,
+      context,
+      { nodeId },
+      null
+    );
+    expect(updateResult.errors).toBeFalsy();
+    expect(updateResult.data).toBeTruthy();
+    const {
+      updateItem: { item: updatedItem },
+    } = updateResult.data!;
+    const {
+      id: updatedId,
+      nodeId: updatedNodeId,
+      ...restOfUpdatedItem
+    } = updatedItem;
+    expect(restOfUpdatedItem).toMatchInlineSnapshot(`
+Object {
+  "label": "Gadget",
+  "personByPersonOrganizationIdAndPersonIdentifier": Object {
+    "identifier": "3",
+    "nodeId": "WyJwZW9wbGUiLDIsIjMiXQ==",
+    "organizationId": 2,
+  },
+  "personIdentifier": "3",
+  "personOrganizationId": 2,
+}
+`);
+  }));
 
 test.todo(
   "Get an error from insert if neither fields nor node ID are specified"
