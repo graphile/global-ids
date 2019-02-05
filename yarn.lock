@@ -180,7 +180,7 @@
     "@types/express-serve-static-core" "*"
     "@types/serve-static" "*"
 
-"@types/graphql@^14.0.3":
+"@types/graphql@^14.0.3", "@types/graphql@^14.0.5":
   version "14.0.5"
   resolved "https://registry.yarnpkg.com/@types/graphql/-/graphql-14.0.5.tgz#e696292fd2d77dc168b5b791710f83463aa39abd"
   integrity sha512-bwGYLE0SRy5ZraC91dqI2bxbspfm10kyJ2Yjuvk4OjdGznh7fkoWW+xXZHfFydJaqu9syZi099cpiZw3GlPDiA==
@@ -1510,6 +1510,14 @@ graphile-build@4.3.1:
     pluralize "^7.0.0"
     semver "^5.6.0"
 
+graphile-utils@^4.3.1:
+  version "4.3.1"
+  resolved "https://registry.yarnpkg.com/graphile-utils/-/graphile-utils-4.3.1.tgz#4533f96120e2e1ba30c2e69e413d99c78c785fe6"
+  integrity sha512-hQ2exfm386KTNGO9LMP/c/RLKyTTmN/wnExyx/faZgfTQT2KJNGSAlKaR/gSeetY/u6ku1ztKFx2IN4b5IWh6w==
+  dependencies:
+    debug ">=2 <3"
+    graphql ">=0.9 <0.14 || ^14.0.2"
+
 graphql-iso-date@^3.6.0:
   version "3.6.1"
   resolved "https://registry.yarnpkg.com/graphql-iso-date/-/graphql-iso-date-3.6.1.tgz#bd2d0dc886e0f954cbbbc496bbf1d480b57ffa96"
@@ -1523,7 +1531,7 @@ graphql-parse-resolve-info@4.1.0:
     "@types/graphql" "^14.0.3"
     debug ">=2 <3"
 
-"graphql@^0.6.0 || ^0.7.0 || ^0.8.0-b || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.2":
+"graphql@>=0.9 <0.14 || ^14.0.2", "graphql@^0.6.0 || ^0.7.0 || ^0.8.0-b || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.2", graphql@^14.1.1:
   version "14.1.1"
   resolved "https://registry.yarnpkg.com/graphql/-/graphql-14.1.1.tgz#d5d77df4b19ef41538d7215d1e7a28834619fac0"
   integrity sha512-C5zDzLqvfPAgTtP8AUPIt9keDabrdRAqSWjj2OPRKrKxI9Fb65I36s1uCs1UUBFnSWTdO7hyHi7z1ZbwKMKF6Q==
@@ -3286,7 +3294,7 @@ pg-types@~2.0.0:
     postgres-date "~1.0.0"
     postgres-interval "^1.1.0"
 
-"pg@>=6.1.0 <8":
+"pg@>=6.1.0 <8", pg@^7.8.0:
   version "7.8.0"
   resolved "https://registry.yarnpkg.com/pg/-/pg-7.8.0.tgz#541c25b3323d85f67ce7d4501a77470976868ce9"
   integrity sha512-yS3C9YD+ft0H7G47uU0eKajgTieggCXdA+Fxhm5G+wionY6kPBa8BEVDwPLMxQvkRkv3/LXiFEqjZm9gfxdW+g==

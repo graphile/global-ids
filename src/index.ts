@@ -1,5 +1,9 @@
 import { Plugin } from "postgraphile";
 import { PgConstraint, PgAttribute, PgClass } from "graphile-build-pg";
+import {
+  makePluginByCombiningPlugins,
+  makeWrapResolversPlugin,
+} from "graphile-utils";
 
 function isForeignKey(c: PgConstraint): boolean {
   return c.type === "f";
@@ -9,20 +13,20 @@ function containsColumn(c: PgConstraint, attr: PgAttribute): boolean {
   return c.keyAttributes.includes(attr);
 }
 
-const GlobalIdExtensionsPlugin: Plugin = function(builder) {
-  // Find the relevant input types:
-  //
-  // - FooInput
-  // - FooBaseInput
-  // - FooPatch
-  //
-  // Apply changes:
-  //
-  // - Make foreign key fields optional (not required)
-  // - Add optional node identifier fields
-  //
-  // Finally wrap the resolver to overwrite the relevant args.
+// Find the relevant input types:
+//
+// - FooInput (isInputType)
+// - FooBaseInput (isPgBaseInput)
+// - FooPatch (isPgPatch)
+//
+// Apply changes:
+//
+// - Make foreign key fields optional (applies only to FooInput)
+// - Add optional node identifier fields
+//
+// Finally wrap the resolver to overwrite the relevant args.
 
+const GlobalIdExtensionsTweakFieldsPlugin: Plugin = function(builder) {
   builder.hook(
     "GraphQLInputObjectType:fields:field",
     function MakeForeignKeyInputFieldsNullable(field, build, context) {
@@ -62,7 +66,12 @@ const GlobalIdExtensionsPlugin: Plugin = function(builder) {
       return field;
     }
   );
-  builder.hook("GraphQLInputObjectType:fields", (fields, build, context) => {
+
+  builder.hook("GraphQLInputObjectType:fields", function AddNewNodeIdFields(
+    fields,
+    build,
+    context
+  ) {
     const {
       extend,
       graphql: { GraphQLID },
@@ -112,5 +121,34 @@ const GlobalIdExtensionsPlugin: Plugin = function(builder) {
     }, fields);
   });
 };
+
+const GlobalIdExtensionsPlugin = makePluginByCombiningPlugins(
+  GlobalIdExtensionsTweakFieldsPlugin,
+  makeWrapResolversPlugin(
+    (context, _build, _field, _options) => {
+      const {
+        scope: { isRootMutation, pgIntrospection },
+      } = context;
+      if (
+        !isRootMutation ||
+        !pgIntrospection ||
+        pgIntrospection.kind !== "class"
+      ) {
+        return null;
+      }
+      const table: PgClass = pgIntrospection;
+      return {
+        table,
+      };
+    },
+    ({ table }) => (resolver, parent, args, context, resolveInfo) => {
+      const newArgs = {
+        ...args,
+      };
+      table;
+      return resolver(parent, newArgs, context, resolveInfo);
+    }
+  )
+);
 
 export default GlobalIdExtensionsPlugin;
