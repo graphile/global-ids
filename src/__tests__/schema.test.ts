@@ -63,6 +63,11 @@ test("Can run regular insert and update mutations", async () => {
             item {
               nodeId
               id
+              personByPersonOrganizationIdAndPersonIdentifier {
+                nodeId
+                organizationId
+                identifier
+              }
               personOrganizationId
               personIdentifier
               label
@@ -85,6 +90,11 @@ test("Can run regular insert and update mutations", async () => {
 Object {
   "label": "Something",
   "nodeId": "WyJpdGVtcyIsMV0=",
+  "personByPersonOrganizationIdAndPersonIdentifier": Object {
+    "identifier": "2",
+    "nodeId": "WyJwZW9wbGUiLDIsIjIiXQ==",
+    "organizationId": 2,
+  },
   "personIdentifier": "2",
   "personOrganizationId": 2,
 }
