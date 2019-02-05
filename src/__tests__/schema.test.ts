@@ -395,6 +395,104 @@ Object {
 `);
   }));
 
-test.todo(
-  "Get an error from update if both are specified and they don't agree"
-);
+test("Get an error from update if both are specified and they don't agree", () =>
+  withContext(async context => {
+    const updateResult = await graphql(
+      schema,
+      `
+        mutation {
+          updateItem(
+            input: {
+              nodeId: "WyJpdGVtcyIsMV0="
+              itemPatch: {
+                label: "Gadget"
+                personByPersonOrganizationIdAndPersonIdentifier: "WyJwZW9wbGUiLDIsIjIiXQ=="
+                personOrganizationId: 2
+                personIdentifier: "3" # Disagrees with above nodeId
+              }
+            }
+          ) {
+            item {
+              nodeId
+              id
+              personByPersonOrganizationIdAndPersonIdentifier {
+                nodeId
+                organizationId
+                identifier
+              }
+              personOrganizationId
+              personIdentifier
+              label
+            }
+          }
+        }
+      `,
+      null,
+      context,
+      {},
+      null
+    );
+    expect(updateResult.errors).toBeTruthy();
+    expect(updateResult.errors).toMatchInlineSnapshot(`
+Array [
+  [GraphQLError: Cannot specify the individual keys and the relation nodeId with different values.],
+]
+`);
+  }));
+
+test("No error from update if both are specified and they do agree", () =>
+  withContext(async context => {
+    const updateResult = await graphql(
+      schema,
+      `
+        mutation {
+          updateItem(
+            input: {
+              nodeId: "WyJpdGVtcyIsMV0="
+              itemPatch: {
+                label: "Gadget"
+                personByPersonOrganizationIdAndPersonIdentifier: "WyJwZW9wbGUiLDIsIjIiXQ=="
+                personOrganizationId: 2
+                personIdentifier: "2" # Agrees with above nodeId
+              }
+            }
+          ) {
+            item {
+              nodeId
+              id
+              personByPersonOrganizationIdAndPersonIdentifier {
+                nodeId
+                organizationId
+                identifier
+              }
+              personOrganizationId
+              personIdentifier
+              label
+            }
+          }
+        }
+      `,
+      null,
+      context,
+      {},
+      null
+    );
+    expect(updateResult.errors).toBeFalsy();
+    expect(updateResult.data).toBeTruthy();
+    const {
+      updateItem: { item },
+    } = updateResult.data!;
+    const { id, nodeId, ...restOfItem } = item;
+    expect(restOfItem).toMatchInlineSnapshot(`
+Object {
+  "label": "Gadget",
+  "personByPersonOrganizationIdAndPersonIdentifier": Object {
+    "identifier": "2",
+    "nodeId": "WyJwZW9wbGUiLDIsIjIiXQ==",
+    "organizationId": 2,
+  },
+  "personIdentifier": "2",
+  "personOrganizationId": 2,
+}
+`);
+  }));

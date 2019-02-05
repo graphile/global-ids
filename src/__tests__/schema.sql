@@ -47,3 +47,6 @@ insert into people (organization_id, identifier, name) values
   (3, '34', 'Acute'),
   (3, '260', 'Reflex'),
   (4, 'green', 'Green Protractor');
+
+insert into items (person_organization_id, person_identifier, label) values
+  (1, 'Sergeant', 'Jewellery');
