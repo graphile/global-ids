@@ -15,6 +15,7 @@ However, you still have to use the underlying primary keys in many places:
 
 - When referencing references to related tables: `mutation {updatePerson(input:{nodeId: ..., patch: {organizationId: 7}}){...}}`
 - When calling SQL functions
+- When dealing with custom types
 - More places?
 
 This plugin aims to let you use global IDs in more places.
@@ -28,13 +29,42 @@ change shape over time until the dust settles.
 Progress:
 
 - [x] Write initial README
-- [ ] Add nodeId support to relations in create mutations
-- [ ] Add nodeId support to relations in update mutations
-- [ ] Update README with instructions
+- [x] Add nodeId support to relations in create mutations
+- [x] Add nodeId support to relations in update mutations
+- [x] Update README with instructions
+- [ ] Add nodeId support to relations in condition input
 - [ ] Add nodeId support to custom queries
 - [ ] Add nodeId support to custom mutations
 - [ ] Add nodeId support to computed columns (as secondary input)
 - [ ] Update README with instructions
+
+## Usage
+
+Install:
+
+```bash
+yarn add @graphile/global-ids
+```
+
+Load on command line:
+
+```bash
+postgraphile --append-plugins @graphile/global-ids
+```
+
+Load in library usage:
+
+```js
+app.use(
+  postgraphile(DB, SCHEMA, {
+    //...
+    appendPlugins: [require("@graphile/global-ids").default],
+  })
+);
+```
+
+Now you can choose to specify the NodeIDs through create/update mutations
+instead of specifying the individual columns.
 
 ## Why is this not part of PostGraphile core?
 
