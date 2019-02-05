@@ -260,6 +260,45 @@ Object {
 `);
   }));
 
+test("Get an error from insert if neither fields nor node ID are specified", () =>
+  withContext(async context => {
+    const createResult = await graphql(
+      schema,
+      `
+        mutation {
+          createItem(input: { item: { label: "Something" } }) {
+            item {
+              nodeId
+              id
+              personByPersonOrganizationIdAndPersonIdentifier {
+                nodeId
+                organizationId
+                identifier
+              }
+              personOrganizationId
+              personIdentifier
+              label
+            }
+          }
+        }
+      `,
+      null,
+      context,
+      {},
+      null
+    );
+    expect(createResult.errors).toBeTruthy();
+    expect(createResult.errors).toMatchInlineSnapshot(`
+Array [
+  [GraphQLError: null value in column "person_organization_id" violates not-null constraint],
+]
+`);
+  }));
+
 test.todo(
-  "Get an error from insert if neither fields nor node ID are specified"
+  "Get an error from insert if both are specified and they don't agree"
+);
+
+test.todo(
+  "Get an error from update if both are specified and they don't agree"
 );
