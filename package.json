@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "concurrently --kill-others 'yarn db:watch' 'yarn build:watch' 'yarn postgraphile:watch'",
+    "prepack": "npm run build",
     "postgraphile": "postgraphile -c global-ids -s app_public --watch --enhance-graphiql --export-schema-graphql schema.graphql",
     "postgraphile:watch": "nodemon --watch src -x 'yarn postgraphile'",
     "db": "psql -1Xv ON_ERROR_STOP=1 -f schema.sql global-ids",
