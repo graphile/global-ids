@@ -37,7 +37,7 @@ async function withContext<T>(cb: (context: any) => Promise<T>) {
 
 beforeAll(async () => {
   schema = await createPostGraphileSchema(DATABASE_URL, "global_ids", {
-    appendPlugins: [GlobalIdsPlugin],
+    appendPlugins: [GlobalIdsPlugin()],
   });
 });
 
