@@ -37,7 +37,13 @@ async function withContext<T>(cb: (context: any) => Promise<T>) {
 
 beforeAll(async () => {
   schema = await createPostGraphileSchema(DATABASE_URL, "global_ids", {
-    appendPlugins: [GlobalIdsPlugin()],
+    appendPlugins: [GlobalIdsPlugin],
+    graphileBuildOptions: {
+      // globalIdShouldDeprecate: true,
+      // globalIdDeprecationReason: 'Deprecated',
+      globalIdShouldDeprecate: (attr) =>
+        attr.name === 'id' || attr.name.endsWith('_id') || attr.name.endsWith('_by'),
+    },
   });
 });
 
