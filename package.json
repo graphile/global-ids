@@ -50,7 +50,8 @@
     "typescript": "^3.2.4"
   },
   "files": [
-    "dist"
+    "dist/*.js*",
+    "dist/*.ts*"
   ],
   "dependencies": {
     "graphile-utils": "^4.3.1"
