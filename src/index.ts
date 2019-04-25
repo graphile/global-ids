@@ -1,4 +1,4 @@
-import { Plugin } from "postgraphile";
+import { Plugin } from "graphile-build";
 import { PgConstraint, PgAttribute, PgClass } from "graphile-build-pg";
 import {
   makePluginByCombiningPlugins,
@@ -164,7 +164,7 @@ const GlobalIdExtensionsTweakFieldsPlugin: Plugin = (builder, config) => {
     }
 
     const attr: PgAttribute = pgFieldIntrospection;
-    const table: PgClass = pgFieldIntrospection.class;
+    const table = attr.class;
 
     if (containsSingleColumn(table.primaryKeyConstraint, attr)) {
       return maybeDeprecate(field, attr, "nodeId");
@@ -178,7 +178,7 @@ const GlobalIdExtensionsTweakFieldsPlugin: Plugin = (builder, config) => {
     if (fk) {
       const fieldName = inflection.singleRelationByKeys(
         fk.keyAttributes,
-        (fk as any).foreignClass,
+        fk.foreignClass,
         table,
         fk,
       );
