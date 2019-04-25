@@ -14,7 +14,7 @@
     "build": "tsc",
     "build:watch": "tsc --watch",
     "test": "npm run testdb && jest",
-    "tslint": "prettier --list-different 'src/**/*' && tslint --config tslint.json --project tsconfig.json",
+    "lint": "tslint --config tslint.json --project tsconfig.json",
     "createdb": "createdb global-ids"
   },
   "repository": {
@@ -37,12 +37,15 @@
     "@types/jest": "^24.0.0",
     "concurrently": "^4.1.0",
     "graphql": "^14.1.1",
+    "graphile-build-pg": "^4.3.1",
     "jest": "^24.0.0",
     "nodemon": "^1.18.9",
     "pg": "^7.8.0",
     "postgraphile": "^4.3.2",
     "prettier": "^1.16.2",
     "ts-jest": "^23.10.5",
+    "tslint": "^5.16.0",
+    "tslint-consistent-codestyle": "^1.15.1",
     "typescript": "^3.2.4"
   },
   "files": [

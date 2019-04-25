@@ -42,7 +42,7 @@ beforeAll(async () => {
       // globalIdShouldDeprecate: true,
       // globalIdDeprecationReason: 'Deprecated',
       globalIdShouldDeprecate: (attr) =>
-        attr.name === 'id' || attr.name.endsWith('_id') || attr.name.endsWith('_by'),
+        attr.name === "id" || attr.name.endsWith("_id") || attr.name.endsWith("_by"),
     },
   });
 });
@@ -52,7 +52,7 @@ test("Schema matches snapshot", async () => {
 });
 
 test("Can run regular insert and update mutations", () =>
-  withContext(async context => {
+  withContext(async (context) => {
     const createResult = await graphql(
       schema,
       `
@@ -84,7 +84,7 @@ test("Can run regular insert and update mutations", () =>
       null,
       context,
       {},
-      null
+      null,
     );
     expect(createResult.errors).toBeFalsy();
     expect(createResult.data).toBeTruthy();
@@ -130,7 +130,7 @@ Object {
       null,
       context,
       { nodeId },
-      null
+      null,
     );
     expect(updateResult.errors).toBeFalsy();
     expect(updateResult.data).toBeTruthy();
@@ -157,7 +157,7 @@ Object {
   }));
 
 test("Can run nodeId insert and update mutations", () =>
-  withContext(async context => {
+  withContext(async (context) => {
     const createResult = await graphql(
       schema,
       `
@@ -188,7 +188,7 @@ test("Can run nodeId insert and update mutations", () =>
       null,
       context,
       {},
-      null
+      null,
     );
     expect(createResult.errors).toBeFalsy();
     expect(createResult.data).toBeTruthy();
@@ -240,7 +240,7 @@ Object {
       null,
       context,
       { nodeId },
-      null
+      null,
     );
     expect(updateResult.errors).toBeFalsy();
     expect(updateResult.data).toBeTruthy();
@@ -267,7 +267,7 @@ Object {
   }));
 
 test("Get an error from insert if neither fields nor node ID are specified", () =>
-  withContext(async context => {
+  withContext(async (context) => {
     const createResult = await graphql(
       schema,
       `
@@ -291,7 +291,7 @@ test("Get an error from insert if neither fields nor node ID are specified", () 
       null,
       context,
       {},
-      null
+      null,
     );
     expect(createResult.errors).toBeTruthy();
     expect(createResult.errors).toMatchInlineSnapshot(`
@@ -302,7 +302,7 @@ Array [
   }));
 
 test("Get an error from insert if both are specified and they don't agree", () =>
-  withContext(async context => {
+  withContext(async (context) => {
     const createResult = await graphql(
       schema,
       `
@@ -335,7 +335,7 @@ test("Get an error from insert if both are specified and they don't agree", () =
       null,
       context,
       {},
-      null
+      null,
     );
     expect(createResult.errors).toBeTruthy();
     expect(createResult.errors).toMatchInlineSnapshot(`
@@ -346,7 +346,7 @@ Array [
   }));
 
 test("No error from insert if both are specified and they do agree", () =>
-  withContext(async context => {
+  withContext(async (context) => {
     const createResult = await graphql(
       schema,
       `
@@ -379,7 +379,7 @@ test("No error from insert if both are specified and they do agree", () =>
       null,
       context,
       {},
-      null
+      null,
     );
     expect(createResult.errors).toBeFalsy();
     expect(createResult.data).toBeTruthy();
@@ -402,7 +402,7 @@ Object {
   }));
 
 test("Get an error from update if both are specified and they don't agree", () =>
-  withContext(async context => {
+  withContext(async (context) => {
     const updateResult = await graphql(
       schema,
       `
@@ -436,7 +436,7 @@ test("Get an error from update if both are specified and they don't agree", () =
       null,
       context,
       {},
-      null
+      null,
     );
     expect(updateResult.errors).toBeTruthy();
     expect(updateResult.errors).toMatchInlineSnapshot(`
@@ -447,7 +447,7 @@ Array [
   }));
 
 test("No error from update if both are specified and they do agree", () =>
-  withContext(async context => {
+  withContext(async (context) => {
     const updateResult = await graphql(
       schema,
       `
@@ -481,7 +481,7 @@ test("No error from update if both are specified and they do agree", () =>
       null,
       context,
       {},
-      null
+      null,
     );
     expect(updateResult.errors).toBeFalsy();
     expect(updateResult.data).toBeTruthy();
