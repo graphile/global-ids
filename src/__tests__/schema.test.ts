@@ -37,20 +37,41 @@ async function withContext<T>(cb: (context: any) => Promise<T>) {
 
 beforeAll(async () => {
   schema = await createPostGraphileSchema(DATABASE_URL, "global_ids", {
-    appendPlugins: [GlobalIdsPlugin],
-    graphileBuildOptions: {
-      // globalIdShouldDeprecate: true,
-      // globalIdDeprecationReason: 'Deprecated',
-      globalIdShouldDeprecate: attr =>
-        attr.name === "id" ||
-        attr.name.endsWith("_id") ||
-        attr.name.endsWith("_by")
-    }
+    appendPlugins: [GlobalIdsPlugin]
   });
 });
 
 test("Schema matches snapshot", async () => {
   expect(printSchema(schema)).toMatchSnapshot();
+});
+
+test("Schema matches snapshot - default deprecations", async () => {
+  const schemaWithDeprecations = await createPostGraphileSchema(
+    DATABASE_URL,
+    "global_ids",
+    {
+      appendPlugins: [GlobalIdsPlugin],
+      graphileBuildOptions: {
+        globalIdShouldDeprecate: true
+      }
+    }
+  );
+  expect(printSchema(schemaWithDeprecations)).toMatchSnapshot();
+});
+
+test("Schema matches snapshot - configured deprecations", async () => {
+  const schemaWithDeprecations = await createPostGraphileSchema(
+    DATABASE_URL,
+    "global_ids",
+    {
+      appendPlugins: [GlobalIdsPlugin],
+      graphileBuildOptions: {
+        globalIdDeprecationReason: "Deprecated",
+        globalIdShouldDeprecate: attr => attr.name === "id"
+      }
+    }
+  );
+  expect(printSchema(schemaWithDeprecations)).toMatchSnapshot();
 });
 
 test("Can run regular insert and update mutations", () =>

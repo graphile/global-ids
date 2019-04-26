@@ -345,7 +345,7 @@ type ItemsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Item\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Item\` edge in the connection.\\"\\"\\"
@@ -593,7 +593,7 @@ type OrganizationsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Organization\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Organization\` edge in the connection.\\"\\"\\"
@@ -647,7 +647,7 @@ type PeopleConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Person\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Person\` edge in the connection.\\"\\"\\"
@@ -680,6 +680,2138 @@ type Person implements Node {
   \\"\\"\\"
   nodeId: ID!
   organizationId: Int!
+  identifier: String!
+  name: String!
+  createdAt: Datetime!
+
+  \\"\\"\\"Reads a single \`Organization\` that is related to this \`Person\`.\\"\\"\\"
+  organizationByOrganizationId: Organization
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Item\`.\\"\\"\\"
+  itemsByPersonOrganizationIdAndPersonIdentifier(
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"The method to use when ordering \`Item\`.\\"\\"\\"
+    orderBy: [ItemsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: ItemCondition
+  ): ItemsConnection!
+}
+
+\\"\\"\\"
+A condition to be used against \`Person\` object types. All fields are tested for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input PersonCondition {
+  \\"\\"\\"Checks for equality with the object’s \`organizationId\` field.\\"\\"\\"
+  organizationId: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`identifier\` field.\\"\\"\\"
+  identifier: String
+
+  \\"\\"\\"Checks for equality with the object’s \`name\` field.\\"\\"\\"
+  name: String
+
+  \\"\\"\\"Checks for equality with the object’s \`createdAt\` field.\\"\\"\\"
+  createdAt: Datetime
+}
+
+\\"\\"\\"An input for mutations affecting \`Person\`\\"\\"\\"
+input PersonInput {
+  organizationId: Int
+  identifier: String!
+  name: String!
+  createdAt: Datetime
+  organizationByOrganizationId: ID
+}
+
+\\"\\"\\"
+Represents an update to a \`Person\`. Fields that are set will be updated.
+\\"\\"\\"
+input PersonPatch {
+  organizationId: Int
+  identifier: String
+  name: String
+  createdAt: Datetime
+  organizationByOrganizationId: ID
+}
+
+\\"\\"\\"The root query type which gives access points into the data universe.\\"\\"\\"
+type Query implements Node {
+  \\"\\"\\"
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  \\"\\"\\"
+  query: Query!
+
+  \\"\\"\\"
+  The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
+  \\"\\"\\"
+  nodeId: ID!
+
+  \\"\\"\\"Fetches an object given its globally unique \`ID\`.\\"\\"\\"
+  node(
+    \\"\\"\\"The globally unique \`ID\`.\\"\\"\\"
+    nodeId: ID!
+  ): Node
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Item\`.\\"\\"\\"
+  allItems(
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"The method to use when ordering \`Item\`.\\"\\"\\"
+    orderBy: [ItemsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: ItemCondition
+  ): ItemsConnection
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Organization\`.\\"\\"\\"
+  allOrganizations(
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"The method to use when ordering \`Organization\`.\\"\\"\\"
+    orderBy: [OrganizationsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: OrganizationCondition
+  ): OrganizationsConnection
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
+  allPeople(
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: PersonCondition
+  ): PeopleConnection
+  itemById(id: Int!): Item
+  organizationById(id: Int!): Organization
+  personByOrganizationIdAndIdentifier(organizationId: Int!, identifier: String!): Person
+
+  \\"\\"\\"Reads a single \`Item\` using its globally unique \`ID\`.\\"\\"\\"
+  item(
+    \\"\\"\\"The globally unique \`ID\` to be used in selecting a single \`Item\`.\\"\\"\\"
+    nodeId: ID!
+  ): Item
+
+  \\"\\"\\"Reads a single \`Organization\` using its globally unique \`ID\`.\\"\\"\\"
+  organization(
+    \\"\\"\\"
+    The globally unique \`ID\` to be used in selecting a single \`Organization\`.
+    \\"\\"\\"
+    nodeId: ID!
+  ): Organization
+
+  \\"\\"\\"Reads a single \`Person\` using its globally unique \`ID\`.\\"\\"\\"
+  person(
+    \\"\\"\\"The globally unique \`ID\` to be used in selecting a single \`Person\`.\\"\\"\\"
+    nodeId: ID!
+  ): Person
+}
+
+\\"\\"\\"All input for the \`updateItemById\` mutation.\\"\\"\\"
+input UpdateItemByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`Item\` being updated.
+  \\"\\"\\"
+  itemPatch: ItemPatch!
+  id: Int!
+}
+
+\\"\\"\\"All input for the \`updateItem\` mutation.\\"\\"\\"
+input UpdateItemInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`Item\` to be updated.
+  \\"\\"\\"
+  nodeId: ID!
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`Item\` being updated.
+  \\"\\"\\"
+  itemPatch: ItemPatch!
+}
+
+\\"\\"\\"The output of our update \`Item\` mutation.\\"\\"\\"
+type UpdateItemPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Item\` that was updated by this mutation.\\"\\"\\"
+  item: Item
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+
+  \\"\\"\\"Reads a single \`Person\` that is related to this \`Item\`.\\"\\"\\"
+  personByPersonOrganizationIdAndPersonIdentifier: Person
+
+  \\"\\"\\"An edge for our \`Item\`. May be used by Relay 1.\\"\\"\\"
+  itemEdge(
+    \\"\\"\\"The method to use when ordering \`Item\`.\\"\\"\\"
+    orderBy: [ItemsOrderBy!] = PRIMARY_KEY_ASC
+  ): ItemsEdge
+}
+
+\\"\\"\\"All input for the \`updateOrganizationById\` mutation.\\"\\"\\"
+input UpdateOrganizationByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`Organization\` being updated.
+  \\"\\"\\"
+  organizationPatch: OrganizationPatch!
+  id: Int!
+}
+
+\\"\\"\\"All input for the \`updateOrganization\` mutation.\\"\\"\\"
+input UpdateOrganizationInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`Organization\` to be updated.
+  \\"\\"\\"
+  nodeId: ID!
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`Organization\` being updated.
+  \\"\\"\\"
+  organizationPatch: OrganizationPatch!
+}
+
+\\"\\"\\"The output of our update \`Organization\` mutation.\\"\\"\\"
+type UpdateOrganizationPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Organization\` that was updated by this mutation.\\"\\"\\"
+  organization: Organization
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+
+  \\"\\"\\"An edge for our \`Organization\`. May be used by Relay 1.\\"\\"\\"
+  organizationEdge(
+    \\"\\"\\"The method to use when ordering \`Organization\`.\\"\\"\\"
+    orderBy: [OrganizationsOrderBy!] = PRIMARY_KEY_ASC
+  ): OrganizationsEdge
+}
+
+\\"\\"\\"
+All input for the \`updatePersonByOrganizationIdAndIdentifier\` mutation.
+\\"\\"\\"
+input UpdatePersonByOrganizationIdAndIdentifierInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`Person\` being updated.
+  \\"\\"\\"
+  personPatch: PersonPatch!
+  organizationId: Int!
+  identifier: String!
+}
+
+\\"\\"\\"All input for the \`updatePerson\` mutation.\\"\\"\\"
+input UpdatePersonInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`Person\` to be updated.
+  \\"\\"\\"
+  nodeId: ID!
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`Person\` being updated.
+  \\"\\"\\"
+  personPatch: PersonPatch!
+}
+
+\\"\\"\\"The output of our update \`Person\` mutation.\\"\\"\\"
+type UpdatePersonPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Person\` that was updated by this mutation.\\"\\"\\"
+  person: Person
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+
+  \\"\\"\\"Reads a single \`Organization\` that is related to this \`Person\`.\\"\\"\\"
+  organizationByOrganizationId: Organization
+
+  \\"\\"\\"An edge for our \`Person\`. May be used by Relay 1.\\"\\"\\"
+  personEdge(
+    \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
+    orderBy: [PeopleOrderBy!] = PRIMARY_KEY_ASC
+  ): PeopleEdge
+}
+"
+`;
+
+exports[`Schema matches snapshot - configured deprecations 1`] = `
+"\\"\\"\\"All input for the create \`Item\` mutation.\\"\\"\\"
+input CreateItemInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Item\` to be created by this mutation.\\"\\"\\"
+  item: ItemInput!
+}
+
+\\"\\"\\"The output of our create \`Item\` mutation.\\"\\"\\"
+type CreateItemPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Item\` that was created by this mutation.\\"\\"\\"
+  item: Item
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+
+  \\"\\"\\"Reads a single \`Person\` that is related to this \`Item\`.\\"\\"\\"
+  personByPersonOrganizationIdAndPersonIdentifier: Person
+
+  \\"\\"\\"An edge for our \`Item\`. May be used by Relay 1.\\"\\"\\"
+  itemEdge(
+    \\"\\"\\"The method to use when ordering \`Item\`.\\"\\"\\"
+    orderBy: [ItemsOrderBy!] = PRIMARY_KEY_ASC
+  ): ItemsEdge
+}
+
+\\"\\"\\"All input for the create \`Organization\` mutation.\\"\\"\\"
+input CreateOrganizationInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Organization\` to be created by this mutation.\\"\\"\\"
+  organization: OrganizationInput!
+}
+
+\\"\\"\\"The output of our create \`Organization\` mutation.\\"\\"\\"
+type CreateOrganizationPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Organization\` that was created by this mutation.\\"\\"\\"
+  organization: Organization
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+
+  \\"\\"\\"An edge for our \`Organization\`. May be used by Relay 1.\\"\\"\\"
+  organizationEdge(
+    \\"\\"\\"The method to use when ordering \`Organization\`.\\"\\"\\"
+    orderBy: [OrganizationsOrderBy!] = PRIMARY_KEY_ASC
+  ): OrganizationsEdge
+}
+
+\\"\\"\\"All input for the create \`Person\` mutation.\\"\\"\\"
+input CreatePersonInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Person\` to be created by this mutation.\\"\\"\\"
+  person: PersonInput!
+}
+
+\\"\\"\\"The output of our create \`Person\` mutation.\\"\\"\\"
+type CreatePersonPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Person\` that was created by this mutation.\\"\\"\\"
+  person: Person
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+
+  \\"\\"\\"Reads a single \`Organization\` that is related to this \`Person\`.\\"\\"\\"
+  organizationByOrganizationId: Organization
+
+  \\"\\"\\"An edge for our \`Person\`. May be used by Relay 1.\\"\\"\\"
+  personEdge(
+    \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
+    orderBy: [PeopleOrderBy!] = PRIMARY_KEY_ASC
+  ): PeopleEdge
+}
+
+\\"\\"\\"A location in a connection that can be used for resuming pagination.\\"\\"\\"
+scalar Cursor
+
+\\"\\"\\"
+A point in time as described by the [ISO
+8601](https://en.wikipedia.org/wiki/ISO_8601) standard. May or may not include a timezone.
+\\"\\"\\"
+scalar Datetime
+
+\\"\\"\\"All input for the \`deleteItemById\` mutation.\\"\\"\\"
+input DeleteItemByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+}
+
+\\"\\"\\"All input for the \`deleteItem\` mutation.\\"\\"\\"
+input DeleteItemInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`Item\` to be deleted.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our delete \`Item\` mutation.\\"\\"\\"
+type DeleteItemPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Item\` that was deleted by this mutation.\\"\\"\\"
+  item: Item
+  deletedItemId: ID
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+
+  \\"\\"\\"Reads a single \`Person\` that is related to this \`Item\`.\\"\\"\\"
+  personByPersonOrganizationIdAndPersonIdentifier: Person
+
+  \\"\\"\\"An edge for our \`Item\`. May be used by Relay 1.\\"\\"\\"
+  itemEdge(
+    \\"\\"\\"The method to use when ordering \`Item\`.\\"\\"\\"
+    orderBy: [ItemsOrderBy!] = PRIMARY_KEY_ASC
+  ): ItemsEdge
+}
+
+\\"\\"\\"All input for the \`deleteOrganizationById\` mutation.\\"\\"\\"
+input DeleteOrganizationByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+}
+
+\\"\\"\\"All input for the \`deleteOrganization\` mutation.\\"\\"\\"
+input DeleteOrganizationInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`Organization\` to be deleted.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our delete \`Organization\` mutation.\\"\\"\\"
+type DeleteOrganizationPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Organization\` that was deleted by this mutation.\\"\\"\\"
+  organization: Organization
+  deletedOrganizationId: ID
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+
+  \\"\\"\\"An edge for our \`Organization\`. May be used by Relay 1.\\"\\"\\"
+  organizationEdge(
+    \\"\\"\\"The method to use when ordering \`Organization\`.\\"\\"\\"
+    orderBy: [OrganizationsOrderBy!] = PRIMARY_KEY_ASC
+  ): OrganizationsEdge
+}
+
+\\"\\"\\"
+All input for the \`deletePersonByOrganizationIdAndIdentifier\` mutation.
+\\"\\"\\"
+input DeletePersonByOrganizationIdAndIdentifierInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  organizationId: Int!
+  identifier: String!
+}
+
+\\"\\"\\"All input for the \`deletePerson\` mutation.\\"\\"\\"
+input DeletePersonInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`Person\` to be deleted.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our delete \`Person\` mutation.\\"\\"\\"
+type DeletePersonPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Person\` that was deleted by this mutation.\\"\\"\\"
+  person: Person
+  deletedPersonId: ID
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+
+  \\"\\"\\"Reads a single \`Organization\` that is related to this \`Person\`.\\"\\"\\"
+  organizationByOrganizationId: Organization
+
+  \\"\\"\\"An edge for our \`Person\`. May be used by Relay 1.\\"\\"\\"
+  personEdge(
+    \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
+    orderBy: [PeopleOrderBy!] = PRIMARY_KEY_ASC
+  ): PeopleEdge
+}
+
+type Item implements Node {
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+  id: Int! @deprecated(reason: \\"Deprecated\\")
+  personOrganizationId: Int!
+  personIdentifier: String!
+  label: String!
+  createdAt: Datetime!
+
+  \\"\\"\\"Reads a single \`Person\` that is related to this \`Item\`.\\"\\"\\"
+  personByPersonOrganizationIdAndPersonIdentifier: Person
+}
+
+\\"\\"\\"
+A condition to be used against \`Item\` object types. All fields are tested for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input ItemCondition {
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`personOrganizationId\` field.\\"\\"\\"
+  personOrganizationId: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`personIdentifier\` field.\\"\\"\\"
+  personIdentifier: String
+
+  \\"\\"\\"Checks for equality with the object’s \`label\` field.\\"\\"\\"
+  label: String
+
+  \\"\\"\\"Checks for equality with the object’s \`createdAt\` field.\\"\\"\\"
+  createdAt: Datetime
+}
+
+\\"\\"\\"An input for mutations affecting \`Item\`\\"\\"\\"
+input ItemInput {
+  id: Int
+  personOrganizationId: Int
+  personIdentifier: String
+  label: String!
+  createdAt: Datetime
+  personByPersonOrganizationIdAndPersonIdentifier: ID
+}
+
+\\"\\"\\"
+Represents an update to a \`Item\`. Fields that are set will be updated.
+\\"\\"\\"
+input ItemPatch {
+  id: Int
+  personOrganizationId: Int
+  personIdentifier: String
+  label: String
+  createdAt: Datetime
+  personByPersonOrganizationIdAndPersonIdentifier: ID
+}
+
+\\"\\"\\"A connection to a list of \`Item\` values.\\"\\"\\"
+type ItemsConnection {
+  \\"\\"\\"A list of \`Item\` objects.\\"\\"\\"
+  nodes: [Item]!
+
+  \\"\\"\\"
+  A list of edges which contains the \`Item\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [ItemsEdge!]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`Item\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
+}
+
+\\"\\"\\"A \`Item\` edge in the connection.\\"\\"\\"
+type ItemsEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`Item\` at the end of the edge.\\"\\"\\"
+  node: Item
+}
+
+\\"\\"\\"Methods to use when ordering \`Item\`.\\"\\"\\"
+enum ItemsOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  PERSON_ORGANIZATION_ID_ASC
+  PERSON_ORGANIZATION_ID_DESC
+  PERSON_IDENTIFIER_ASC
+  PERSON_IDENTIFIER_DESC
+  LABEL_ASC
+  LABEL_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+\\"\\"\\"
+The root mutation type which contains root level fields which mutate data.
+\\"\\"\\"
+type Mutation {
+  \\"\\"\\"Creates a single \`Item\`.\\"\\"\\"
+  createItem(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: CreateItemInput!
+  ): CreateItemPayload
+
+  \\"\\"\\"Creates a single \`Organization\`.\\"\\"\\"
+  createOrganization(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: CreateOrganizationInput!
+  ): CreateOrganizationPayload
+
+  \\"\\"\\"Creates a single \`Person\`.\\"\\"\\"
+  createPerson(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: CreatePersonInput!
+  ): CreatePersonPayload
+
+  \\"\\"\\"Updates a single \`Item\` using its globally unique id and a patch.\\"\\"\\"
+  updateItem(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateItemInput!
+  ): UpdateItemPayload
+
+  \\"\\"\\"Updates a single \`Item\` using a unique key and a patch.\\"\\"\\"
+  updateItemById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateItemByIdInput!
+  ): UpdateItemPayload
+
+  \\"\\"\\"
+  Updates a single \`Organization\` using its globally unique id and a patch.
+  \\"\\"\\"
+  updateOrganization(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateOrganizationInput!
+  ): UpdateOrganizationPayload
+
+  \\"\\"\\"Updates a single \`Organization\` using a unique key and a patch.\\"\\"\\"
+  updateOrganizationById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateOrganizationByIdInput!
+  ): UpdateOrganizationPayload
+
+  \\"\\"\\"Updates a single \`Person\` using its globally unique id and a patch.\\"\\"\\"
+  updatePerson(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdatePersonInput!
+  ): UpdatePersonPayload
+
+  \\"\\"\\"Updates a single \`Person\` using a unique key and a patch.\\"\\"\\"
+  updatePersonByOrganizationIdAndIdentifier(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdatePersonByOrganizationIdAndIdentifierInput!
+  ): UpdatePersonPayload
+
+  \\"\\"\\"Deletes a single \`Item\` using its globally unique id.\\"\\"\\"
+  deleteItem(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteItemInput!
+  ): DeleteItemPayload
+
+  \\"\\"\\"Deletes a single \`Item\` using a unique key.\\"\\"\\"
+  deleteItemById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteItemByIdInput!
+  ): DeleteItemPayload
+
+  \\"\\"\\"Deletes a single \`Organization\` using its globally unique id.\\"\\"\\"
+  deleteOrganization(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteOrganizationInput!
+  ): DeleteOrganizationPayload
+
+  \\"\\"\\"Deletes a single \`Organization\` using a unique key.\\"\\"\\"
+  deleteOrganizationById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteOrganizationByIdInput!
+  ): DeleteOrganizationPayload
+
+  \\"\\"\\"Deletes a single \`Person\` using its globally unique id.\\"\\"\\"
+  deletePerson(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeletePersonInput!
+  ): DeletePersonPayload
+
+  \\"\\"\\"Deletes a single \`Person\` using a unique key.\\"\\"\\"
+  deletePersonByOrganizationIdAndIdentifier(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeletePersonByOrganizationIdAndIdentifierInput!
+  ): DeletePersonPayload
+}
+
+\\"\\"\\"An object with a globally unique \`ID\`.\\"\\"\\"
+interface Node {
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+type Organization implements Node {
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+  id: Int! @deprecated(reason: \\"Deprecated\\")
+  name: String!
+  createdAt: Datetime!
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
+  peopleByOrganizationId(
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: PersonCondition
+  ): PeopleConnection!
+}
+
+\\"\\"\\"
+A condition to be used against \`Organization\` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input OrganizationCondition {
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`name\` field.\\"\\"\\"
+  name: String
+
+  \\"\\"\\"Checks for equality with the object’s \`createdAt\` field.\\"\\"\\"
+  createdAt: Datetime
+}
+
+\\"\\"\\"An input for mutations affecting \`Organization\`\\"\\"\\"
+input OrganizationInput {
+  id: Int
+  name: String!
+  createdAt: Datetime
+}
+
+\\"\\"\\"
+Represents an update to a \`Organization\`. Fields that are set will be updated.
+\\"\\"\\"
+input OrganizationPatch {
+  id: Int
+  name: String
+  createdAt: Datetime
+}
+
+\\"\\"\\"A connection to a list of \`Organization\` values.\\"\\"\\"
+type OrganizationsConnection {
+  \\"\\"\\"A list of \`Organization\` objects.\\"\\"\\"
+  nodes: [Organization]!
+
+  \\"\\"\\"
+  A list of edges which contains the \`Organization\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [OrganizationsEdge!]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`Organization\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
+}
+
+\\"\\"\\"A \`Organization\` edge in the connection.\\"\\"\\"
+type OrganizationsEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`Organization\` at the end of the edge.\\"\\"\\"
+  node: Organization
+}
+
+\\"\\"\\"Methods to use when ordering \`Organization\`.\\"\\"\\"
+enum OrganizationsOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+\\"\\"\\"Information about pagination in a connection.\\"\\"\\"
+type PageInfo {
+  \\"\\"\\"When paginating forwards, are there more items?\\"\\"\\"
+  hasNextPage: Boolean!
+
+  \\"\\"\\"When paginating backwards, are there more items?\\"\\"\\"
+  hasPreviousPage: Boolean!
+
+  \\"\\"\\"When paginating backwards, the cursor to continue.\\"\\"\\"
+  startCursor: Cursor
+
+  \\"\\"\\"When paginating forwards, the cursor to continue.\\"\\"\\"
+  endCursor: Cursor
+}
+
+\\"\\"\\"A connection to a list of \`Person\` values.\\"\\"\\"
+type PeopleConnection {
+  \\"\\"\\"A list of \`Person\` objects.\\"\\"\\"
+  nodes: [Person]!
+
+  \\"\\"\\"
+  A list of edges which contains the \`Person\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [PeopleEdge!]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`Person\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
+}
+
+\\"\\"\\"A \`Person\` edge in the connection.\\"\\"\\"
+type PeopleEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`Person\` at the end of the edge.\\"\\"\\"
+  node: Person
+}
+
+\\"\\"\\"Methods to use when ordering \`Person\`.\\"\\"\\"
+enum PeopleOrderBy {
+  NATURAL
+  ORGANIZATION_ID_ASC
+  ORGANIZATION_ID_DESC
+  IDENTIFIER_ASC
+  IDENTIFIER_DESC
+  NAME_ASC
+  NAME_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+type Person implements Node {
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+  organizationId: Int!
+  identifier: String!
+  name: String!
+  createdAt: Datetime!
+
+  \\"\\"\\"Reads a single \`Organization\` that is related to this \`Person\`.\\"\\"\\"
+  organizationByOrganizationId: Organization
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Item\`.\\"\\"\\"
+  itemsByPersonOrganizationIdAndPersonIdentifier(
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"The method to use when ordering \`Item\`.\\"\\"\\"
+    orderBy: [ItemsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: ItemCondition
+  ): ItemsConnection!
+}
+
+\\"\\"\\"
+A condition to be used against \`Person\` object types. All fields are tested for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input PersonCondition {
+  \\"\\"\\"Checks for equality with the object’s \`organizationId\` field.\\"\\"\\"
+  organizationId: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`identifier\` field.\\"\\"\\"
+  identifier: String
+
+  \\"\\"\\"Checks for equality with the object’s \`name\` field.\\"\\"\\"
+  name: String
+
+  \\"\\"\\"Checks for equality with the object’s \`createdAt\` field.\\"\\"\\"
+  createdAt: Datetime
+}
+
+\\"\\"\\"An input for mutations affecting \`Person\`\\"\\"\\"
+input PersonInput {
+  organizationId: Int
+  identifier: String!
+  name: String!
+  createdAt: Datetime
+  organizationByOrganizationId: ID
+}
+
+\\"\\"\\"
+Represents an update to a \`Person\`. Fields that are set will be updated.
+\\"\\"\\"
+input PersonPatch {
+  organizationId: Int
+  identifier: String
+  name: String
+  createdAt: Datetime
+  organizationByOrganizationId: ID
+}
+
+\\"\\"\\"The root query type which gives access points into the data universe.\\"\\"\\"
+type Query implements Node {
+  \\"\\"\\"
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  \\"\\"\\"
+  query: Query!
+
+  \\"\\"\\"
+  The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
+  \\"\\"\\"
+  nodeId: ID!
+
+  \\"\\"\\"Fetches an object given its globally unique \`ID\`.\\"\\"\\"
+  node(
+    \\"\\"\\"The globally unique \`ID\`.\\"\\"\\"
+    nodeId: ID!
+  ): Node
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Item\`.\\"\\"\\"
+  allItems(
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"The method to use when ordering \`Item\`.\\"\\"\\"
+    orderBy: [ItemsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: ItemCondition
+  ): ItemsConnection
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Organization\`.\\"\\"\\"
+  allOrganizations(
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"The method to use when ordering \`Organization\`.\\"\\"\\"
+    orderBy: [OrganizationsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: OrganizationCondition
+  ): OrganizationsConnection
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
+  allPeople(
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: PersonCondition
+  ): PeopleConnection
+  itemById(id: Int!): Item
+  organizationById(id: Int!): Organization
+  personByOrganizationIdAndIdentifier(organizationId: Int!, identifier: String!): Person
+
+  \\"\\"\\"Reads a single \`Item\` using its globally unique \`ID\`.\\"\\"\\"
+  item(
+    \\"\\"\\"The globally unique \`ID\` to be used in selecting a single \`Item\`.\\"\\"\\"
+    nodeId: ID!
+  ): Item
+
+  \\"\\"\\"Reads a single \`Organization\` using its globally unique \`ID\`.\\"\\"\\"
+  organization(
+    \\"\\"\\"
+    The globally unique \`ID\` to be used in selecting a single \`Organization\`.
+    \\"\\"\\"
+    nodeId: ID!
+  ): Organization
+
+  \\"\\"\\"Reads a single \`Person\` using its globally unique \`ID\`.\\"\\"\\"
+  person(
+    \\"\\"\\"The globally unique \`ID\` to be used in selecting a single \`Person\`.\\"\\"\\"
+    nodeId: ID!
+  ): Person
+}
+
+\\"\\"\\"All input for the \`updateItemById\` mutation.\\"\\"\\"
+input UpdateItemByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`Item\` being updated.
+  \\"\\"\\"
+  itemPatch: ItemPatch!
+  id: Int!
+}
+
+\\"\\"\\"All input for the \`updateItem\` mutation.\\"\\"\\"
+input UpdateItemInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`Item\` to be updated.
+  \\"\\"\\"
+  nodeId: ID!
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`Item\` being updated.
+  \\"\\"\\"
+  itemPatch: ItemPatch!
+}
+
+\\"\\"\\"The output of our update \`Item\` mutation.\\"\\"\\"
+type UpdateItemPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Item\` that was updated by this mutation.\\"\\"\\"
+  item: Item
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+
+  \\"\\"\\"Reads a single \`Person\` that is related to this \`Item\`.\\"\\"\\"
+  personByPersonOrganizationIdAndPersonIdentifier: Person
+
+  \\"\\"\\"An edge for our \`Item\`. May be used by Relay 1.\\"\\"\\"
+  itemEdge(
+    \\"\\"\\"The method to use when ordering \`Item\`.\\"\\"\\"
+    orderBy: [ItemsOrderBy!] = PRIMARY_KEY_ASC
+  ): ItemsEdge
+}
+
+\\"\\"\\"All input for the \`updateOrganizationById\` mutation.\\"\\"\\"
+input UpdateOrganizationByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`Organization\` being updated.
+  \\"\\"\\"
+  organizationPatch: OrganizationPatch!
+  id: Int!
+}
+
+\\"\\"\\"All input for the \`updateOrganization\` mutation.\\"\\"\\"
+input UpdateOrganizationInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`Organization\` to be updated.
+  \\"\\"\\"
+  nodeId: ID!
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`Organization\` being updated.
+  \\"\\"\\"
+  organizationPatch: OrganizationPatch!
+}
+
+\\"\\"\\"The output of our update \`Organization\` mutation.\\"\\"\\"
+type UpdateOrganizationPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Organization\` that was updated by this mutation.\\"\\"\\"
+  organization: Organization
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+
+  \\"\\"\\"An edge for our \`Organization\`. May be used by Relay 1.\\"\\"\\"
+  organizationEdge(
+    \\"\\"\\"The method to use when ordering \`Organization\`.\\"\\"\\"
+    orderBy: [OrganizationsOrderBy!] = PRIMARY_KEY_ASC
+  ): OrganizationsEdge
+}
+
+\\"\\"\\"
+All input for the \`updatePersonByOrganizationIdAndIdentifier\` mutation.
+\\"\\"\\"
+input UpdatePersonByOrganizationIdAndIdentifierInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`Person\` being updated.
+  \\"\\"\\"
+  personPatch: PersonPatch!
+  organizationId: Int!
+  identifier: String!
+}
+
+\\"\\"\\"All input for the \`updatePerson\` mutation.\\"\\"\\"
+input UpdatePersonInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`Person\` to be updated.
+  \\"\\"\\"
+  nodeId: ID!
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`Person\` being updated.
+  \\"\\"\\"
+  personPatch: PersonPatch!
+}
+
+\\"\\"\\"The output of our update \`Person\` mutation.\\"\\"\\"
+type UpdatePersonPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Person\` that was updated by this mutation.\\"\\"\\"
+  person: Person
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+
+  \\"\\"\\"Reads a single \`Organization\` that is related to this \`Person\`.\\"\\"\\"
+  organizationByOrganizationId: Organization
+
+  \\"\\"\\"An edge for our \`Person\`. May be used by Relay 1.\\"\\"\\"
+  personEdge(
+    \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
+    orderBy: [PeopleOrderBy!] = PRIMARY_KEY_ASC
+  ): PeopleEdge
+}
+"
+`;
+
+exports[`Schema matches snapshot - default deprecations 1`] = `
+"\\"\\"\\"All input for the create \`Item\` mutation.\\"\\"\\"
+input CreateItemInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Item\` to be created by this mutation.\\"\\"\\"
+  item: ItemInput!
+}
+
+\\"\\"\\"The output of our create \`Item\` mutation.\\"\\"\\"
+type CreateItemPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Item\` that was created by this mutation.\\"\\"\\"
+  item: Item
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+
+  \\"\\"\\"Reads a single \`Person\` that is related to this \`Item\`.\\"\\"\\"
+  personByPersonOrganizationIdAndPersonIdentifier: Person
+
+  \\"\\"\\"An edge for our \`Item\`. May be used by Relay 1.\\"\\"\\"
+  itemEdge(
+    \\"\\"\\"The method to use when ordering \`Item\`.\\"\\"\\"
+    orderBy: [ItemsOrderBy!] = PRIMARY_KEY_ASC
+  ): ItemsEdge
+}
+
+\\"\\"\\"All input for the create \`Organization\` mutation.\\"\\"\\"
+input CreateOrganizationInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Organization\` to be created by this mutation.\\"\\"\\"
+  organization: OrganizationInput!
+}
+
+\\"\\"\\"The output of our create \`Organization\` mutation.\\"\\"\\"
+type CreateOrganizationPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Organization\` that was created by this mutation.\\"\\"\\"
+  organization: Organization
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+
+  \\"\\"\\"An edge for our \`Organization\`. May be used by Relay 1.\\"\\"\\"
+  organizationEdge(
+    \\"\\"\\"The method to use when ordering \`Organization\`.\\"\\"\\"
+    orderBy: [OrganizationsOrderBy!] = PRIMARY_KEY_ASC
+  ): OrganizationsEdge
+}
+
+\\"\\"\\"All input for the create \`Person\` mutation.\\"\\"\\"
+input CreatePersonInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Person\` to be created by this mutation.\\"\\"\\"
+  person: PersonInput!
+}
+
+\\"\\"\\"The output of our create \`Person\` mutation.\\"\\"\\"
+type CreatePersonPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Person\` that was created by this mutation.\\"\\"\\"
+  person: Person
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+
+  \\"\\"\\"Reads a single \`Organization\` that is related to this \`Person\`.\\"\\"\\"
+  organizationByOrganizationId: Organization
+
+  \\"\\"\\"An edge for our \`Person\`. May be used by Relay 1.\\"\\"\\"
+  personEdge(
+    \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
+    orderBy: [PeopleOrderBy!] = PRIMARY_KEY_ASC
+  ): PeopleEdge
+}
+
+\\"\\"\\"A location in a connection that can be used for resuming pagination.\\"\\"\\"
+scalar Cursor
+
+\\"\\"\\"
+A point in time as described by the [ISO
+8601](https://en.wikipedia.org/wiki/ISO_8601) standard. May or may not include a timezone.
+\\"\\"\\"
+scalar Datetime
+
+\\"\\"\\"All input for the \`deleteItemById\` mutation.\\"\\"\\"
+input DeleteItemByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+}
+
+\\"\\"\\"All input for the \`deleteItem\` mutation.\\"\\"\\"
+input DeleteItemInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`Item\` to be deleted.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our delete \`Item\` mutation.\\"\\"\\"
+type DeleteItemPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Item\` that was deleted by this mutation.\\"\\"\\"
+  item: Item
+  deletedItemId: ID
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+
+  \\"\\"\\"Reads a single \`Person\` that is related to this \`Item\`.\\"\\"\\"
+  personByPersonOrganizationIdAndPersonIdentifier: Person
+
+  \\"\\"\\"An edge for our \`Item\`. May be used by Relay 1.\\"\\"\\"
+  itemEdge(
+    \\"\\"\\"The method to use when ordering \`Item\`.\\"\\"\\"
+    orderBy: [ItemsOrderBy!] = PRIMARY_KEY_ASC
+  ): ItemsEdge
+}
+
+\\"\\"\\"All input for the \`deleteOrganizationById\` mutation.\\"\\"\\"
+input DeleteOrganizationByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+}
+
+\\"\\"\\"All input for the \`deleteOrganization\` mutation.\\"\\"\\"
+input DeleteOrganizationInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`Organization\` to be deleted.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our delete \`Organization\` mutation.\\"\\"\\"
+type DeleteOrganizationPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Organization\` that was deleted by this mutation.\\"\\"\\"
+  organization: Organization
+  deletedOrganizationId: ID
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+
+  \\"\\"\\"An edge for our \`Organization\`. May be used by Relay 1.\\"\\"\\"
+  organizationEdge(
+    \\"\\"\\"The method to use when ordering \`Organization\`.\\"\\"\\"
+    orderBy: [OrganizationsOrderBy!] = PRIMARY_KEY_ASC
+  ): OrganizationsEdge
+}
+
+\\"\\"\\"
+All input for the \`deletePersonByOrganizationIdAndIdentifier\` mutation.
+\\"\\"\\"
+input DeletePersonByOrganizationIdAndIdentifierInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  organizationId: Int!
+  identifier: String!
+}
+
+\\"\\"\\"All input for the \`deletePerson\` mutation.\\"\\"\\"
+input DeletePersonInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`Person\` to be deleted.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our delete \`Person\` mutation.\\"\\"\\"
+type DeletePersonPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Person\` that was deleted by this mutation.\\"\\"\\"
+  person: Person
+  deletedPersonId: ID
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+
+  \\"\\"\\"Reads a single \`Organization\` that is related to this \`Person\`.\\"\\"\\"
+  organizationByOrganizationId: Organization
+
+  \\"\\"\\"An edge for our \`Person\`. May be used by Relay 1.\\"\\"\\"
+  personEdge(
+    \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
+    orderBy: [PeopleOrderBy!] = PRIMARY_KEY_ASC
+  ): PeopleEdge
+}
+
+type Item implements Node {
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+  id: Int! @deprecated(reason: \\"Prefer using the Relay global identifier property \`nodeId\` instead.\\")
+  personOrganizationId: Int!
+  personIdentifier: String!
+  label: String!
+  createdAt: Datetime!
+
+  \\"\\"\\"Reads a single \`Person\` that is related to this \`Item\`.\\"\\"\\"
+  personByPersonOrganizationIdAndPersonIdentifier: Person
+}
+
+\\"\\"\\"
+A condition to be used against \`Item\` object types. All fields are tested for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input ItemCondition {
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`personOrganizationId\` field.\\"\\"\\"
+  personOrganizationId: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`personIdentifier\` field.\\"\\"\\"
+  personIdentifier: String
+
+  \\"\\"\\"Checks for equality with the object’s \`label\` field.\\"\\"\\"
+  label: String
+
+  \\"\\"\\"Checks for equality with the object’s \`createdAt\` field.\\"\\"\\"
+  createdAt: Datetime
+}
+
+\\"\\"\\"An input for mutations affecting \`Item\`\\"\\"\\"
+input ItemInput {
+  id: Int
+  personOrganizationId: Int
+  personIdentifier: String
+  label: String!
+  createdAt: Datetime
+  personByPersonOrganizationIdAndPersonIdentifier: ID
+}
+
+\\"\\"\\"
+Represents an update to a \`Item\`. Fields that are set will be updated.
+\\"\\"\\"
+input ItemPatch {
+  id: Int
+  personOrganizationId: Int
+  personIdentifier: String
+  label: String
+  createdAt: Datetime
+  personByPersonOrganizationIdAndPersonIdentifier: ID
+}
+
+\\"\\"\\"A connection to a list of \`Item\` values.\\"\\"\\"
+type ItemsConnection {
+  \\"\\"\\"A list of \`Item\` objects.\\"\\"\\"
+  nodes: [Item]!
+
+  \\"\\"\\"
+  A list of edges which contains the \`Item\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [ItemsEdge!]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`Item\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
+}
+
+\\"\\"\\"A \`Item\` edge in the connection.\\"\\"\\"
+type ItemsEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`Item\` at the end of the edge.\\"\\"\\"
+  node: Item
+}
+
+\\"\\"\\"Methods to use when ordering \`Item\`.\\"\\"\\"
+enum ItemsOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  PERSON_ORGANIZATION_ID_ASC
+  PERSON_ORGANIZATION_ID_DESC
+  PERSON_IDENTIFIER_ASC
+  PERSON_IDENTIFIER_DESC
+  LABEL_ASC
+  LABEL_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+\\"\\"\\"
+The root mutation type which contains root level fields which mutate data.
+\\"\\"\\"
+type Mutation {
+  \\"\\"\\"Creates a single \`Item\`.\\"\\"\\"
+  createItem(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: CreateItemInput!
+  ): CreateItemPayload
+
+  \\"\\"\\"Creates a single \`Organization\`.\\"\\"\\"
+  createOrganization(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: CreateOrganizationInput!
+  ): CreateOrganizationPayload
+
+  \\"\\"\\"Creates a single \`Person\`.\\"\\"\\"
+  createPerson(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: CreatePersonInput!
+  ): CreatePersonPayload
+
+  \\"\\"\\"Updates a single \`Item\` using its globally unique id and a patch.\\"\\"\\"
+  updateItem(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateItemInput!
+  ): UpdateItemPayload
+
+  \\"\\"\\"Updates a single \`Item\` using a unique key and a patch.\\"\\"\\"
+  updateItemById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateItemByIdInput!
+  ): UpdateItemPayload
+
+  \\"\\"\\"
+  Updates a single \`Organization\` using its globally unique id and a patch.
+  \\"\\"\\"
+  updateOrganization(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateOrganizationInput!
+  ): UpdateOrganizationPayload
+
+  \\"\\"\\"Updates a single \`Organization\` using a unique key and a patch.\\"\\"\\"
+  updateOrganizationById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateOrganizationByIdInput!
+  ): UpdateOrganizationPayload
+
+  \\"\\"\\"Updates a single \`Person\` using its globally unique id and a patch.\\"\\"\\"
+  updatePerson(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdatePersonInput!
+  ): UpdatePersonPayload
+
+  \\"\\"\\"Updates a single \`Person\` using a unique key and a patch.\\"\\"\\"
+  updatePersonByOrganizationIdAndIdentifier(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdatePersonByOrganizationIdAndIdentifierInput!
+  ): UpdatePersonPayload
+
+  \\"\\"\\"Deletes a single \`Item\` using its globally unique id.\\"\\"\\"
+  deleteItem(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteItemInput!
+  ): DeleteItemPayload
+
+  \\"\\"\\"Deletes a single \`Item\` using a unique key.\\"\\"\\"
+  deleteItemById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteItemByIdInput!
+  ): DeleteItemPayload
+
+  \\"\\"\\"Deletes a single \`Organization\` using its globally unique id.\\"\\"\\"
+  deleteOrganization(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteOrganizationInput!
+  ): DeleteOrganizationPayload
+
+  \\"\\"\\"Deletes a single \`Organization\` using a unique key.\\"\\"\\"
+  deleteOrganizationById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteOrganizationByIdInput!
+  ): DeleteOrganizationPayload
+
+  \\"\\"\\"Deletes a single \`Person\` using its globally unique id.\\"\\"\\"
+  deletePerson(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeletePersonInput!
+  ): DeletePersonPayload
+
+  \\"\\"\\"Deletes a single \`Person\` using a unique key.\\"\\"\\"
+  deletePersonByOrganizationIdAndIdentifier(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeletePersonByOrganizationIdAndIdentifierInput!
+  ): DeletePersonPayload
+}
+
+\\"\\"\\"An object with a globally unique \`ID\`.\\"\\"\\"
+interface Node {
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+type Organization implements Node {
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+  id: Int! @deprecated(reason: \\"Prefer using the Relay global identifier property \`nodeId\` instead.\\")
+  name: String!
+  createdAt: Datetime!
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Person\`.\\"\\"\\"
+  peopleByOrganizationId(
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"The method to use when ordering \`Person\`.\\"\\"\\"
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: PersonCondition
+  ): PeopleConnection!
+}
+
+\\"\\"\\"
+A condition to be used against \`Organization\` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input OrganizationCondition {
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`name\` field.\\"\\"\\"
+  name: String
+
+  \\"\\"\\"Checks for equality with the object’s \`createdAt\` field.\\"\\"\\"
+  createdAt: Datetime
+}
+
+\\"\\"\\"An input for mutations affecting \`Organization\`\\"\\"\\"
+input OrganizationInput {
+  id: Int
+  name: String!
+  createdAt: Datetime
+}
+
+\\"\\"\\"
+Represents an update to a \`Organization\`. Fields that are set will be updated.
+\\"\\"\\"
+input OrganizationPatch {
+  id: Int
+  name: String
+  createdAt: Datetime
+}
+
+\\"\\"\\"A connection to a list of \`Organization\` values.\\"\\"\\"
+type OrganizationsConnection {
+  \\"\\"\\"A list of \`Organization\` objects.\\"\\"\\"
+  nodes: [Organization]!
+
+  \\"\\"\\"
+  A list of edges which contains the \`Organization\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [OrganizationsEdge!]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`Organization\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
+}
+
+\\"\\"\\"A \`Organization\` edge in the connection.\\"\\"\\"
+type OrganizationsEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`Organization\` at the end of the edge.\\"\\"\\"
+  node: Organization
+}
+
+\\"\\"\\"Methods to use when ordering \`Organization\`.\\"\\"\\"
+enum OrganizationsOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+\\"\\"\\"Information about pagination in a connection.\\"\\"\\"
+type PageInfo {
+  \\"\\"\\"When paginating forwards, are there more items?\\"\\"\\"
+  hasNextPage: Boolean!
+
+  \\"\\"\\"When paginating backwards, are there more items?\\"\\"\\"
+  hasPreviousPage: Boolean!
+
+  \\"\\"\\"When paginating backwards, the cursor to continue.\\"\\"\\"
+  startCursor: Cursor
+
+  \\"\\"\\"When paginating forwards, the cursor to continue.\\"\\"\\"
+  endCursor: Cursor
+}
+
+\\"\\"\\"A connection to a list of \`Person\` values.\\"\\"\\"
+type PeopleConnection {
+  \\"\\"\\"A list of \`Person\` objects.\\"\\"\\"
+  nodes: [Person]!
+
+  \\"\\"\\"
+  A list of edges which contains the \`Person\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [PeopleEdge!]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`Person\` you could get from the connection.\\"\\"\\"
+  totalCount: Int!
+}
+
+\\"\\"\\"A \`Person\` edge in the connection.\\"\\"\\"
+type PeopleEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`Person\` at the end of the edge.\\"\\"\\"
+  node: Person
+}
+
+\\"\\"\\"Methods to use when ordering \`Person\`.\\"\\"\\"
+enum PeopleOrderBy {
+  NATURAL
+  ORGANIZATION_ID_ASC
+  ORGANIZATION_ID_DESC
+  IDENTIFIER_ASC
+  IDENTIFIER_DESC
+  NAME_ASC
+  NAME_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+type Person implements Node {
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+  organizationId: Int! @deprecated(reason: \\"Prefer using the Relay global identifier property \`organizationByOrganizationId.nodeId\` instead.\\")
   identifier: String!
   name: String!
   createdAt: Datetime!
