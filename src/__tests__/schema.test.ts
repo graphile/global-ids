@@ -10,7 +10,7 @@ let pool: Pool;
 
 beforeAll(() => {
   pool = new Pool({
-    connectionString: DATABASE_URL,
+    connectionString: DATABASE_URL
   });
 });
 afterAll(() => {
@@ -22,7 +22,7 @@ async function withContext<T>(cb: (context: any) => Promise<T>) {
   await client.query("begin");
   try {
     const context = {
-      pgClient: client,
+      pgClient: client
     };
     return await cb(context);
   } finally {
@@ -41,9 +41,11 @@ beforeAll(async () => {
     graphileBuildOptions: {
       // globalIdShouldDeprecate: true,
       // globalIdDeprecationReason: 'Deprecated',
-      globalIdShouldDeprecate: (attr) =>
-        attr.name === "id" || attr.name.endsWith("_id") || attr.name.endsWith("_by"),
-    },
+      globalIdShouldDeprecate: attr =>
+        attr.name === "id" ||
+        attr.name.endsWith("_id") ||
+        attr.name.endsWith("_by")
+    }
   });
 });
 
@@ -52,7 +54,7 @@ test("Schema matches snapshot", async () => {
 });
 
 test("Can run regular insert and update mutations", () =>
-  withContext(async (context) => {
+  withContext(async context => {
     const createResult = await graphql(
       schema,
       `
@@ -84,12 +86,12 @@ test("Can run regular insert and update mutations", () =>
       null,
       context,
       {},
-      null,
+      null
     );
     expect(createResult.errors).toBeFalsy();
     expect(createResult.data).toBeTruthy();
     const {
-      createItem: { item },
+      createItem: { item }
     } = createResult.data!;
     const { id, nodeId, ...restOfItem } = item;
     expect(restOfItem).toMatchInlineSnapshot(`
@@ -130,12 +132,12 @@ Object {
       null,
       context,
       { nodeId },
-      null,
+      null
     );
     expect(updateResult.errors).toBeFalsy();
     expect(updateResult.data).toBeTruthy();
     const {
-      updateItem: { item: updatedItem },
+      updateItem: { item: updatedItem }
     } = updateResult.data!;
     const {
       id: updatedId,
@@ -157,7 +159,7 @@ Object {
   }));
 
 test("Can run nodeId insert and update mutations", () =>
-  withContext(async (context) => {
+  withContext(async context => {
     const createResult = await graphql(
       schema,
       `
@@ -188,12 +190,12 @@ test("Can run nodeId insert and update mutations", () =>
       null,
       context,
       {},
-      null,
+      null
     );
     expect(createResult.errors).toBeFalsy();
     expect(createResult.data).toBeTruthy();
     const {
-      createItem: { item },
+      createItem: { item }
     } = createResult.data!;
     const { id, nodeId, ...restOfItem } = item;
     expect(restOfItem).toMatchInlineSnapshot(`
@@ -240,12 +242,12 @@ Object {
       null,
       context,
       { nodeId },
-      null,
+      null
     );
     expect(updateResult.errors).toBeFalsy();
     expect(updateResult.data).toBeTruthy();
     const {
-      updateItem: { item: updatedItem },
+      updateItem: { item: updatedItem }
     } = updateResult.data!;
     const {
       id: updatedId,
@@ -267,7 +269,7 @@ Object {
   }));
 
 test("Get an error from insert if neither fields nor node ID are specified", () =>
-  withContext(async (context) => {
+  withContext(async context => {
     const createResult = await graphql(
       schema,
       `
@@ -291,7 +293,7 @@ test("Get an error from insert if neither fields nor node ID are specified", () 
       null,
       context,
       {},
-      null,
+      null
     );
     expect(createResult.errors).toBeTruthy();
     expect(createResult.errors).toMatchInlineSnapshot(`
@@ -302,7 +304,7 @@ Array [
   }));
 
 test("Get an error from insert if both are specified and they don't agree", () =>
-  withContext(async (context) => {
+  withContext(async context => {
     const createResult = await graphql(
       schema,
       `
@@ -335,7 +337,7 @@ test("Get an error from insert if both are specified and they don't agree", () =
       null,
       context,
       {},
-      null,
+      null
     );
     expect(createResult.errors).toBeTruthy();
     expect(createResult.errors).toMatchInlineSnapshot(`
@@ -346,7 +348,7 @@ Array [
   }));
 
 test("No error from insert if both are specified and they do agree", () =>
-  withContext(async (context) => {
+  withContext(async context => {
     const createResult = await graphql(
       schema,
       `
@@ -379,12 +381,12 @@ test("No error from insert if both are specified and they do agree", () =>
       null,
       context,
       {},
-      null,
+      null
     );
     expect(createResult.errors).toBeFalsy();
     expect(createResult.data).toBeTruthy();
     const {
-      createItem: { item },
+      createItem: { item }
     } = createResult.data!;
     const { id, nodeId, ...restOfItem } = item;
     expect(restOfItem).toMatchInlineSnapshot(`
@@ -402,7 +404,7 @@ Object {
   }));
 
 test("Get an error from update if both are specified and they don't agree", () =>
-  withContext(async (context) => {
+  withContext(async context => {
     const updateResult = await graphql(
       schema,
       `
@@ -436,7 +438,7 @@ test("Get an error from update if both are specified and they don't agree", () =
       null,
       context,
       {},
-      null,
+      null
     );
     expect(updateResult.errors).toBeTruthy();
     expect(updateResult.errors).toMatchInlineSnapshot(`
@@ -447,7 +449,7 @@ Array [
   }));
 
 test("No error from update if both are specified and they do agree", () =>
-  withContext(async (context) => {
+  withContext(async context => {
     const updateResult = await graphql(
       schema,
       `
@@ -481,12 +483,12 @@ test("No error from update if both are specified and they do agree", () =>
       null,
       context,
       {},
-      null,
+      null
     );
     expect(updateResult.errors).toBeFalsy();
     expect(updateResult.data).toBeTruthy();
     const {
-      updateItem: { item },
+      updateItem: { item }
     } = updateResult.data!;
     const { id, nodeId, ...restOfItem } = item;
     expect(restOfItem).toMatchInlineSnapshot(`

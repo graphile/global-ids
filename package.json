@@ -14,7 +14,7 @@
     "build": "tsc",
     "build:watch": "tsc --watch",
     "test": "npm run testdb && jest",
-    "lint": "tslint --config tslint.json --project tsconfig.json",
+    "lint": "prettier --list-different 'src/**/*.ts' && tslint --config tslint.json --project tsconfig.json",
     "createdb": "createdb global-ids"
   },
   "repository": {
@@ -46,6 +46,7 @@
     "prettier": "^1.16.2",
     "ts-jest": "^23.10.5",
     "tslint": "^5.16.0",
+    "tslint-config-prettier": "^1.18.0",
     "tslint-consistent-codestyle": "^1.15.1",
     "typescript": "^3.2.4"
   },

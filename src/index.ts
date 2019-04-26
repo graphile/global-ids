@@ -2,7 +2,7 @@ import { Plugin } from "graphile-build";
 import { PgConstraint, PgAttribute, PgClass } from "graphile-build-pg";
 import {
   makePluginByCombiningPlugins,
-  makeWrapResolversPlugin,
+  makeWrapResolversPlugin
 } from "graphile-utils";
 import { GraphQLFieldConfig } from "graphql";
 
@@ -10,11 +10,12 @@ function isForeignKey(c: PgConstraint): boolean {
   return c.type === "f";
 }
 
-function containsSingleColumn(c: PgConstraint | void, attr: PgAttribute): boolean {
+function containsSingleColumn(
+  c: PgConstraint | void,
+  attr: PgAttribute
+): boolean {
   return (
-    c != null &&
-    c.keyAttributes.length === 1 &&
-    c.keyAttributes[0] === attr
+    c != null && c.keyAttributes.length === 1 && c.keyAttributes[0] === attr
   );
 }
 
@@ -46,25 +47,25 @@ export interface GlobalIdPluginOptions {
 const GlobalIdExtensionsTweakFieldsPlugin: Plugin = (builder, config) => {
   const options: GlobalIdPluginOptions = {
     globalIdShouldDeprecate: false,
-    globalIdDeprecationReason: (preferredField) =>
+    globalIdDeprecationReason: preferredField =>
       `Prefer using the Relay global identifier property \`${preferredField}\` instead.`,
 
-    ...config,
+    ...config
   };
 
   builder.hook(
     "GraphQLInputObjectType:fields:field",
     function MakeForeignKeyInputFieldsNullable(field, build, context) {
       const {
-        graphql: { getNullableType },
+        graphql: { getNullableType }
       } = build;
       const {
         scope: {
           isPgRowType,
           isInputType,
           pgIntrospection,
-          pgFieldIntrospection,
-        },
+          pgFieldIntrospection
+        }
       } = context;
 
       if (
@@ -80,27 +81,27 @@ const GlobalIdExtensionsTweakFieldsPlugin: Plugin = (builder, config) => {
 
       // If this field belongs to a foreign key, mark it nullable.
       if (
-        table.constraints.some((c) => isForeignKey(c) && containsColumn(c, attr))
+        table.constraints.some(c => isForeignKey(c) && containsColumn(c, attr))
       ) {
         return {
           ...field,
-          type: getNullableType(field.type),
+          type: getNullableType(field.type)
         };
       }
 
       return field;
-    },
+    }
   );
 
   builder.hook("GraphQLInputObjectType:fields", function AddNewNodeIdFields(
     fields,
     build,
-    context,
+    context
   ) {
     const {
       extend,
       graphql: { GraphQLID },
-      inflection,
+      inflection
     } = build;
     const {
       scope: {
@@ -108,9 +109,9 @@ const GlobalIdExtensionsTweakFieldsPlugin: Plugin = (builder, config) => {
         isInputType,
         isPgPatch,
         isPgBaseInput,
-        pgIntrospection,
+        pgIntrospection
       },
-      fieldWithHooks,
+      fieldWithHooks
     } = context;
 
     if (
@@ -129,30 +130,28 @@ const GlobalIdExtensionsTweakFieldsPlugin: Plugin = (builder, config) => {
         fk.keyAttributes,
         foreignTable,
         table,
-        fk,
+        fk
       );
       return extend(memo, {
         [fieldName]: fieldWithHooks(
           fieldName,
           {
-            type: GraphQLID,
+            type: GraphQLID
           },
           {
             pgFieldIntrospection: fk,
-            isPgForeignKeyNodeIdField: true,
-          },
-        ),
+            isPgForeignKeyNodeIdField: true
+          }
+        )
       });
     }, fields);
   });
 
   // add deprecations
   builder.hook("GraphQLObjectType:fields:field", (field, build, context) => {
+    const { inflection } = build;
     const {
-      inflection,
-    } = build;
-    const {
-      scope: { pgFieldIntrospection },
+      scope: { pgFieldIntrospection }
     } = context;
 
     if (
@@ -170,9 +169,8 @@ const GlobalIdExtensionsTweakFieldsPlugin: Plugin = (builder, config) => {
       return maybeDeprecate(field, attr, "nodeId");
     }
 
-    const fk = table.constraints.find((c) =>
-      isForeignKey(c) &&
-      containsSingleColumn(c, attr),
+    const fk = table.constraints.find(
+      c => isForeignKey(c) && containsSingleColumn(c, attr)
     );
 
     if (fk) {
@@ -180,7 +178,7 @@ const GlobalIdExtensionsTweakFieldsPlugin: Plugin = (builder, config) => {
         fk.keyAttributes,
         fk.foreignClass,
         table,
-        fk,
+        fk
       );
 
       return maybeDeprecate(field, attr, `${fieldName}.nodeId`);
@@ -192,19 +190,22 @@ const GlobalIdExtensionsTweakFieldsPlugin: Plugin = (builder, config) => {
   function maybeDeprecate<T extends GraphQLFieldConfig<any, any>>(
     field: T,
     attr: PgAttribute,
-    preferredField: string,
+    preferredField: string
   ): T {
-    const condition = typeof options.globalIdShouldDeprecate === "function"
-      ? options.globalIdShouldDeprecate(attr)
-      : options.globalIdShouldDeprecate;
+    const condition =
+      typeof options.globalIdShouldDeprecate === "function"
+        ? options.globalIdShouldDeprecate(attr)
+        : options.globalIdShouldDeprecate;
 
-    const deprecationReason = field.deprecationReason || (
-      typeof options.globalIdDeprecationReason === "function"
+    const deprecationReason =
+      field.deprecationReason ||
+      (typeof options.globalIdDeprecationReason === "function"
         ? options.globalIdDeprecationReason(preferredField)
-        : options.globalIdDeprecationReason
-    );
+        : options.globalIdDeprecationReason);
 
-    return (condition && deprecationReason) ? { ...field, deprecationReason } : field;
+    return condition && deprecationReason
+      ? { ...field, deprecationReason }
+      : field;
   }
 };
 
@@ -217,13 +218,13 @@ const GlobalIdExtensionsPlugin = makePluginByCombiningPlugins(
           isRootMutation,
           pgFieldIntrospection,
           isPgCreateMutationField,
-          isPgUpdateMutationField,
-        },
+          isPgUpdateMutationField
+        }
       } = context;
       const {
         inflection,
         getTypeAndIdentifiersFromNodeId,
-        pgGetGqlTypeByTypeIdAndModifier,
+        pgGetGqlTypeByTypeIdAndModifier
       } = build;
       if (
         !isRootMutation ||
@@ -242,7 +243,7 @@ const GlobalIdExtensionsPlugin = makePluginByCombiningPlugins(
         inflection,
         getTypeAndIdentifiersFromNodeId,
         pgGetGqlTypeByTypeIdAndModifier,
-        inputOrPatchFieldName,
+        inputOrPatchFieldName
       };
     },
     ({
@@ -250,19 +251,19 @@ const GlobalIdExtensionsPlugin = makePluginByCombiningPlugins(
       inflection,
       getTypeAndIdentifiersFromNodeId,
       pgGetGqlTypeByTypeIdAndModifier,
-      inputOrPatchFieldName,
+      inputOrPatchFieldName
     }) => (resolver, parent, args, context, resolveInfo) => {
       // TODO: move as much of this logic into the filter as we can so we can
       // avoid runtime inflection, type lookup, etc
       const obj = {
-        ...args.input[inputOrPatchFieldName],
+        ...args.input[inputOrPatchFieldName]
       };
       const newArgs = {
         ...args,
         input: {
           ...args.input,
-          [inputOrPatchFieldName]: obj,
-        },
+          [inputOrPatchFieldName]: obj
+        }
       };
       const foreignKeys = table.constraints.filter(isForeignKey);
       for (const fk of foreignKeys) {
@@ -270,13 +271,13 @@ const GlobalIdExtensionsPlugin = makePluginByCombiningPlugins(
         const foreignTable: PgClass = fk.foreignClass;
         const TableType = pgGetGqlTypeByTypeIdAndModifier(
           foreignTable.type.id,
-          null,
+          null
         );
         const fieldName = inflection.singleRelationByKeys(
           fk.keyAttributes,
           foreignTable,
           table,
-          fk,
+          fk
         );
         if (obj[fieldName]) {
           const nodeId = obj[fieldName];
@@ -292,7 +293,7 @@ const GlobalIdExtensionsPlugin = makePluginByCombiningPlugins(
               obj[keyFieldName] !== value
             ) {
               throw new Error(
-                "Cannot specify the individual keys and the relation nodeId with different values.",
+                "Cannot specify the individual keys and the relation nodeId with different values."
               );
             }
             obj[keyFieldName] = value;
@@ -302,8 +303,8 @@ const GlobalIdExtensionsPlugin = makePluginByCombiningPlugins(
         }
       }
       return resolver(parent, newArgs, context, resolveInfo);
-    },
-  ),
+    }
+  )
 );
 
 export default GlobalIdExtensionsPlugin;
