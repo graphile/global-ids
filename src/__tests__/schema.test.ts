@@ -246,8 +246,6 @@ Object {
             }
           ) {
             item {
-              nodeId
-              id
               personByPersonOrganizationIdAndPersonIdentifier {
                 nodeId
                 organizationId
@@ -270,12 +268,7 @@ Object {
     const {
       updateItem: { item: updatedItem }
     } = updateResult.data!;
-    const {
-      id: updatedId,
-      nodeId: updatedNodeId,
-      ...restOfUpdatedItem
-    } = updatedItem;
-    expect(restOfUpdatedItem).toMatchInlineSnapshot(`
+    expect(updatedItem).toMatchInlineSnapshot(`
 Object {
   "label": "Gadget",
   "personByPersonOrganizationIdAndPersonIdentifier": Object {
@@ -286,6 +279,42 @@ Object {
   "personIdentifier": "3",
   "personOrganizationId": 2,
 }
+`);
+
+    const unsetResult = await graphql(
+      schema,
+      `
+        mutation($nodeId: ID!) {
+          updateItem(
+            input: {
+              nodeId: $nodeId
+              itemPatch: {
+                personByPersonOrganizationIdAndPersonIdentifier: null
+              }
+            }
+          ) {
+            item {
+              personByPersonOrganizationIdAndPersonIdentifier {
+                nodeId
+                organizationId
+                identifier
+              }
+              personOrganizationId
+              personIdentifier
+            }
+          }
+        }
+      `,
+      null,
+      context,
+      { nodeId },
+      null
+    );
+
+    expect(unsetResult.errors).toMatchInlineSnapshot(`
+Array [
+  [GraphQLError: null value in column "person_organization_id" violates not-null constraint],
+]
 `);
   }));
 
