@@ -22,7 +22,11 @@
     "type": "git",
     "url": "git+https://github.com/graphile/global-ids.git"
   },
-  "keywords": ["PostGraphile", "plugin", "relay"],
+  "keywords": [
+    "PostGraphile",
+    "plugin",
+    "relay"
+  ],
   "author": "Benjie Gillam <code@benjiegillam.com>",
   "license": "MIT",
   "bugs": {
@@ -30,25 +34,28 @@
   },
   "homepage": "https://github.com/graphile/global-ids#readme",
   "devDependencies": {
-    "@types/graphql": "^14.0.5",
-    "@types/jest": "^24.0.0",
+    "@types/graphql": "^14.2.0",
+    "@types/jest": "^24.0.12",
     "concurrently": "^4.1.0",
-    "graphile-build": "^4.4.0-rc.0",
-    "graphile-build-pg": "^4.4.0-rc.0",
-    "graphql": "^14.1.1",
-    "jest": "^24.0.0",
-    "nodemon": "^1.18.9",
-    "pg": "^7.8.0",
-    "postgraphile": "^4.4.0-rc.0",
-    "prettier": "^1.16.2",
-    "ts-jest": "^23.10.5",
+    "graphile-build": "^4.4.0",
+    "graphile-build-pg": "^4.4.0",
+    "graphql": "^14.2.1",
+    "jest": "^24.7.1",
+    "nodemon": "^1.19.0",
+    "pg": "^7.10.0",
+    "postgraphile": "^4.4.0",
+    "prettier": "^1.17.0",
+    "ts-jest": "^24.0.2",
     "tslint": "^5.16.0",
     "tslint-config-prettier": "^1.18.0",
     "tslint-consistent-codestyle": "^1.15.1",
-    "typescript": "^3.2.4"
+    "typescript": "^3.4.5"
   },
-  "files": ["dist/*.js*", "dist/*.ts*"],
+  "files": [
+    "dist/*.js*",
+    "dist/*.ts*"
+  ],
   "dependencies": {
-    "graphile-utils": "^4.3.1"
+    "graphile-utils": "^4.4.0"
   }
 }
