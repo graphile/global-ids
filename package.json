@@ -13,7 +13,7 @@
     "testdb": "psql -1Xv ON_ERROR_STOP=1 -f src/__tests__/schema.sql \"${TEST_DATABASE_URL:-pggql_test}\"",
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "test": "npm run testdb && jest",
+    "test": "npm run testdb && jest -i",
     "lint": "prettier --list-different 'src/**/*.ts' && tslint --config tslint.json --project tsconfig.json",
     "lint:fix": "prettier --write 'src/**/*.ts' && tslint --config tslint.json --project tsconfig.json --fix",
     "createdb": "createdb global-ids"
@@ -22,11 +22,7 @@
     "type": "git",
     "url": "git+https://github.com/graphile/global-ids.git"
   },
-  "keywords": [
-    "PostGraphile",
-    "plugin",
-    "relay"
-  ],
+  "keywords": ["PostGraphile", "plugin", "relay"],
   "author": "Benjie Gillam <code@benjiegillam.com>",
   "license": "MIT",
   "bugs": {
@@ -51,10 +47,7 @@
     "tslint-consistent-codestyle": "^1.15.1",
     "typescript": "^3.4.5"
   },
-  "files": [
-    "dist/*.js*",
-    "dist/*.ts*"
-  ],
+  "files": ["dist/*.js*", "dist/*.ts*"],
   "dependencies": {
     "graphile-utils": "^4.4.0"
   }
