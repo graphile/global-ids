@@ -10,7 +10,7 @@ let pool: Pool;
 
 beforeAll(() => {
   pool = new Pool({
-    connectionString: DATABASE_URL
+    connectionString: DATABASE_URL,
   });
 });
 afterAll(() => {
@@ -22,7 +22,7 @@ async function withContext<T>(cb: (context: any) => Promise<T>) {
   await client.query("begin");
   try {
     const context = {
-      pgClient: client
+      pgClient: client,
     };
     return await cb(context);
   } finally {
@@ -37,7 +37,7 @@ async function withContext<T>(cb: (context: any) => Promise<T>) {
 
 beforeAll(async () => {
   schema = await createPostGraphileSchema(DATABASE_URL, "global_ids", {
-    appendPlugins: [GlobalIdsPlugin]
+    appendPlugins: [GlobalIdsPlugin],
   });
 });
 
@@ -52,8 +52,8 @@ test("Schema matches snapshot - default deprecations", async () => {
     {
       appendPlugins: [GlobalIdsPlugin],
       graphileBuildOptions: {
-        globalIdShouldDeprecate: true
-      }
+        globalIdShouldDeprecate: true,
+      },
     }
   );
   expect(printSchema(schemaWithDeprecations)).toMatchSnapshot();
@@ -67,8 +67,8 @@ test("Schema matches snapshot - configured deprecations", async () => {
       appendPlugins: [GlobalIdsPlugin],
       graphileBuildOptions: {
         globalIdDeprecationReason: "Deprecated",
-        globalIdShouldDeprecate: attr => attr.name === "id"
-      }
+        globalIdShouldDeprecate: attr => attr.name === "id",
+      },
     }
   );
   expect(printSchema(schemaWithDeprecations)).toMatchSnapshot();
@@ -112,7 +112,7 @@ test("Can run regular insert and update mutations", () =>
     expect(createResult.errors).toBeFalsy();
     expect(createResult.data).toBeTruthy();
     const {
-      createItem: { item }
+      createItem: { item },
     } = createResult.data!;
     const { id, nodeId, ...restOfItem } = item;
     expect(restOfItem).toMatchInlineSnapshot(`
@@ -158,7 +158,7 @@ Object {
     expect(updateResult.errors).toBeFalsy();
     expect(updateResult.data).toBeTruthy();
     const {
-      updateItem: { item: updatedItem }
+      updateItem: { item: updatedItem },
     } = updateResult.data!;
     const {
       id: updatedId,
@@ -216,7 +216,7 @@ test("Can run nodeId insert and update mutations", () =>
     expect(createResult.errors).toBeFalsy();
     expect(createResult.data).toBeTruthy();
     const {
-      createItem: { item }
+      createItem: { item },
     } = createResult.data!;
     const { id, nodeId, ...restOfItem } = item;
     expect(restOfItem).toMatchInlineSnapshot(`
@@ -266,7 +266,7 @@ Object {
     expect(updateResult.errors).toBeFalsy();
     expect(updateResult.data).toBeTruthy();
     const {
-      updateItem: { item: updatedItem }
+      updateItem: { item: updatedItem },
     } = updateResult.data!;
     expect(updatedItem).toMatchInlineSnapshot(`
 Object {
@@ -436,7 +436,7 @@ test("No error from insert if both are specified and they do agree", () =>
     expect(createResult.errors).toBeFalsy();
     expect(createResult.data).toBeTruthy();
     const {
-      createItem: { item }
+      createItem: { item },
     } = createResult.data!;
     const { id, nodeId, ...restOfItem } = item;
     expect(restOfItem).toMatchInlineSnapshot(`
@@ -538,7 +538,7 @@ test("No error from update if both are specified and they do agree", () =>
     expect(updateResult.errors).toBeFalsy();
     expect(updateResult.data).toBeTruthy();
     const {
-      updateItem: { item }
+      updateItem: { item },
     } = updateResult.data!;
     const { id, nodeId, ...restOfItem } = item;
     expect(restOfItem).toMatchInlineSnapshot(`

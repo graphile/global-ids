@@ -2,7 +2,7 @@ import { Plugin } from "graphile-build";
 import { PgConstraint, PgAttribute, PgClass } from "graphile-build-pg";
 import {
   makePluginByCombiningPlugins,
-  makeWrapResolversPlugin
+  makeWrapResolversPlugin,
 } from "graphile-utils";
 import { GraphQLFieldConfig } from "graphql";
 
@@ -50,22 +50,22 @@ const GlobalIdExtensionsTweakFieldsPlugin: Plugin = (builder, config) => {
     globalIdDeprecationReason: preferredField =>
       `Prefer using the Relay global identifier property \`${preferredField}\` instead.`,
 
-    ...config
+    ...config,
   };
 
   builder.hook(
     "GraphQLInputObjectType:fields:field",
     function MakeForeignKeyInputFieldsNullable(field, build, context) {
       const {
-        graphql: { getNullableType }
+        graphql: { getNullableType },
       } = build;
       const {
         scope: {
           isPgRowType,
           isInputType,
           pgIntrospection,
-          pgFieldIntrospection
-        }
+          pgFieldIntrospection,
+        },
       } = context;
 
       if (
@@ -85,7 +85,7 @@ const GlobalIdExtensionsTweakFieldsPlugin: Plugin = (builder, config) => {
       ) {
         return {
           ...field,
-          type: getNullableType(field.type)
+          type: getNullableType(field.type),
         };
       }
 
@@ -101,7 +101,7 @@ const GlobalIdExtensionsTweakFieldsPlugin: Plugin = (builder, config) => {
     const {
       extend,
       graphql: { GraphQLID },
-      inflection
+      inflection,
     } = build;
     const {
       scope: {
@@ -109,9 +109,9 @@ const GlobalIdExtensionsTweakFieldsPlugin: Plugin = (builder, config) => {
         isInputType,
         isPgPatch,
         isPgBaseInput,
-        pgIntrospection
+        pgIntrospection,
       },
-      fieldWithHooks
+      fieldWithHooks,
     } = context;
 
     if (
@@ -136,13 +136,13 @@ const GlobalIdExtensionsTweakFieldsPlugin: Plugin = (builder, config) => {
         [fieldName]: fieldWithHooks(
           fieldName,
           {
-            type: GraphQLID
+            type: GraphQLID,
           },
           {
             pgFieldIntrospection: fk,
-            isPgForeignKeyNodeIdField: true
+            isPgForeignKeyNodeIdField: true,
           }
-        )
+        ),
       });
     }, fields);
   });
@@ -151,7 +151,7 @@ const GlobalIdExtensionsTweakFieldsPlugin: Plugin = (builder, config) => {
   builder.hook("GraphQLObjectType:fields:field", (field, build, context) => {
     const { inflection } = build;
     const {
-      scope: { pgFieldIntrospection }
+      scope: { pgFieldIntrospection },
     } = context;
 
     if (
@@ -218,13 +218,13 @@ const GlobalIdExtensionsPlugin = makePluginByCombiningPlugins(
           isRootMutation,
           pgFieldIntrospection,
           isPgCreateMutationField,
-          isPgUpdateMutationField
-        }
+          isPgUpdateMutationField,
+        },
       } = context;
       const {
         inflection,
         getTypeAndIdentifiersFromNodeId,
-        pgGetGqlTypeByTypeIdAndModifier
+        pgGetGqlTypeByTypeIdAndModifier,
       } = build;
       if (
         !isRootMutation ||
@@ -243,7 +243,7 @@ const GlobalIdExtensionsPlugin = makePluginByCombiningPlugins(
         inflection,
         getTypeAndIdentifiersFromNodeId,
         pgGetGqlTypeByTypeIdAndModifier,
-        inputOrPatchFieldName
+        inputOrPatchFieldName,
       };
     },
     ({
@@ -251,19 +251,19 @@ const GlobalIdExtensionsPlugin = makePluginByCombiningPlugins(
       inflection,
       getTypeAndIdentifiersFromNodeId,
       pgGetGqlTypeByTypeIdAndModifier,
-      inputOrPatchFieldName
+      inputOrPatchFieldName,
     }) => (resolver, parent, args, context, resolveInfo) => {
       // TODO: move as much of this logic into the filter as we can so we can
       // avoid runtime inflection, type lookup, etc
       const obj = {
-        ...args.input[inputOrPatchFieldName]
+        ...args.input[inputOrPatchFieldName],
       };
       const newArgs = {
         ...args,
         input: {
           ...args.input,
-          [inputOrPatchFieldName]: obj
-        }
+          [inputOrPatchFieldName]: obj,
+        },
       };
       const foreignKeys = table.constraints.filter(isForeignKey);
       for (const fk of foreignKeys) {

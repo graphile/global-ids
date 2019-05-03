@@ -15,17 +15,14 @@
     "build:watch": "tsc --watch",
     "test": "npm run testdb && jest",
     "lint": "prettier --list-different 'src/**/*.ts' && tslint --config tslint.json --project tsconfig.json",
+    "lint:fix": "prettier --write 'src/**/*.ts' && tslint --config tslint.json --project tsconfig.json --fix",
     "createdb": "createdb global-ids"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/graphile/global-ids.git"
   },
-  "keywords": [
-    "PostGraphile",
-    "plugin",
-    "relay"
-  ],
+  "keywords": ["PostGraphile", "plugin", "relay"],
   "author": "Benjie Gillam <code@benjiegillam.com>",
   "license": "MIT",
   "bugs": {
@@ -50,10 +47,7 @@
     "tslint-consistent-codestyle": "^1.15.1",
     "typescript": "^3.2.4"
   },
-  "files": [
-    "dist/*.js*",
-    "dist/*.ts*"
-  ],
+  "files": ["dist/*.js*", "dist/*.ts*"],
   "dependencies": {
     "graphile-utils": "^4.3.1"
   }
