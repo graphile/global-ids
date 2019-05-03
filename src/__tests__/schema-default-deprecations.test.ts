@@ -15,15 +15,6 @@ afterAll(() => {
   pool.end();
 });
 
-beforeAll(async () => {});
-
-test("Schema matches snapshot", async () => {
-  const schema = await createPostGraphileSchema(pool, "global_ids", {
-    appendPlugins: [GlobalIdsPlugin],
-  });
-  expect(printSchema(schema)).toMatchSnapshot();
-});
-
 test("Schema matches snapshot - default deprecations", async () => {
   const schemaWithDeprecations = await createPostGraphileSchema(
     pool,
@@ -32,21 +23,6 @@ test("Schema matches snapshot - default deprecations", async () => {
       appendPlugins: [GlobalIdsPlugin],
       graphileBuildOptions: {
         globalIdShouldDeprecate: true,
-      },
-    }
-  );
-  expect(printSchema(schemaWithDeprecations)).toMatchSnapshot();
-});
-
-test("Schema matches snapshot - configured deprecations", async () => {
-  const schemaWithDeprecations = await createPostGraphileSchema(
-    pool,
-    "global_ids",
-    {
-      appendPlugins: [GlobalIdsPlugin],
-      graphileBuildOptions: {
-        globalIdDeprecationReason: "Deprecated",
-        globalIdShouldDeprecate: attr => attr.name === "id",
       },
     }
   );
