@@ -192,15 +192,19 @@ const GlobalIdExtensionsPlugin = makePluginByCombiningPlugins(
           table,
           fk
         );
-        if (obj[fieldName]) {
-          const nodeId = obj[fieldName];
-          const { Type, identifiers } = getTypeAndIdentifiersFromNodeId(nodeId);
+        const nodeId = obj[fieldName];
+        if (nodeId !== undefined) {
+          const { Type, identifiers } = nodeId
+            ? getTypeAndIdentifiersFromNodeId(nodeId)
+            : { Type: TableType, identifiers: null };
+
           if (Type !== TableType) {
             return null;
           }
+
           fk.keyAttributes.forEach((attr, i) => {
             const keyFieldName = inflection.column(attr);
-            const value = identifiers[i];
+            const value = identifiers && identifiers[i];
             if (
               obj[keyFieldName] !== undefined &&
               obj[keyFieldName] !== value
