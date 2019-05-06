@@ -1,6 +1,7 @@
 {
-  "extends": ["tslint:latest", "tslint-config-prettier"],
+  "extends": ["tslint:latest", "tslint-config-prettier", "tslint-consistent-codestyle"],
   "rules": {
+    "no-unnecessary-type-annotation": true,
     "object-literal-sort-keys": false,
     "only-arrow-functions": false,
     "ordered-imports": false,

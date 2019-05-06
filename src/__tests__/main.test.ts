@@ -1,5 +1,5 @@
 import { createPostGraphileSchema } from "postgraphile";
-import { GraphQLSchema, printSchema, graphql } from "graphql";
+import { GraphQLSchema, graphql } from "graphql";
 import { Pool } from "pg";
 import GlobalIdsPlugin from "..";
 
@@ -36,13 +36,9 @@ async function withContext<T>(cb: (context: any) => Promise<T>) {
 }
 
 beforeAll(async () => {
-  schema = await createPostGraphileSchema(DATABASE_URL, "global_ids", {
+  schema = await createPostGraphileSchema(pool, "global_ids", {
     appendPlugins: [GlobalIdsPlugin],
   });
-});
-
-test("Schema matches snapshot", async () => {
-  expect(printSchema(schema)).toMatchSnapshot();
 });
 
 test("Can run regular insert and update mutations", () =>
@@ -237,7 +233,7 @@ Object {
     expect(updateResult.errors).toBeFalsy();
     expect(updateResult.data).toBeTruthy();
     const {
-      updateItem: { item: updatedItem }
+      updateItem: { item: updatedItem },
     } = updateResult.data!;
     expect(updatedItem).toMatchInlineSnapshot(`
 Object {

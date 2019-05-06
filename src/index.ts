@@ -1,12 +1,22 @@
-import { Plugin } from "postgraphile";
+import { Plugin } from "graphile-build";
 import { PgConstraint, PgAttribute, PgClass } from "graphile-build-pg";
 import {
   makePluginByCombiningPlugins,
   makeWrapResolversPlugin,
 } from "graphile-utils";
+import { GraphQLFieldConfig } from "graphql";
 
 function isForeignKey(c: PgConstraint): boolean {
   return c.type === "f";
+}
+
+function containsSingleColumn(
+  c: PgConstraint | void,
+  attr: PgAttribute
+): boolean {
+  return (
+    c != null && c.keyAttributes.length === 1 && c.keyAttributes[0] === attr
+  );
 }
 
 function containsColumn(c: PgConstraint, attr: PgAttribute): boolean {
@@ -26,7 +36,23 @@ function containsColumn(c: PgConstraint, attr: PgAttribute): boolean {
 //
 // Finally wrap the resolver to overwrite the relevant args.
 
-const GlobalIdExtensionsTweakFieldsPlugin: Plugin = function(builder) {
+type DeprecationSelector = boolean | ((attr: PgAttribute) => boolean);
+type DeprecationReason = string | ((preferredField: string) => string);
+
+export interface GlobalIdPluginOptions {
+  globalIdShouldDeprecate?: DeprecationSelector;
+  globalIdDeprecationReason?: DeprecationReason;
+}
+
+const GlobalIdExtensionsTweakFieldsPlugin: Plugin = (builder, config) => {
+  const options: GlobalIdPluginOptions = {
+    globalIdShouldDeprecate: false,
+    globalIdDeprecationReason: preferredField =>
+      `Prefer using the Relay global identifier property \`${preferredField}\` instead.`,
+
+    ...config,
+  };
+
   builder.hook(
     "GraphQLInputObjectType:fields:field",
     function MakeForeignKeyInputFieldsNullable(field, build, context) {
@@ -120,6 +146,67 @@ const GlobalIdExtensionsTweakFieldsPlugin: Plugin = function(builder) {
       });
     }, fields);
   });
+
+  // add deprecations
+  builder.hook("GraphQLObjectType:fields:field", (field, build, context) => {
+    const { inflection } = build;
+    const {
+      scope: { pgFieldIntrospection },
+    } = context;
+
+    if (
+      !pgFieldIntrospection ||
+      !pgFieldIntrospection.class ||
+      pgFieldIntrospection.kind !== "attribute"
+    ) {
+      return field;
+    }
+
+    const attr: PgAttribute = pgFieldIntrospection;
+    const table = attr.class;
+
+    if (containsSingleColumn(table.primaryKeyConstraint, attr)) {
+      return maybeDeprecate(field, attr, "nodeId");
+    }
+
+    const fk = table.constraints.find(
+      c => isForeignKey(c) && containsSingleColumn(c, attr)
+    );
+
+    if (fk) {
+      const fieldName = inflection.singleRelationByKeys(
+        fk.keyAttributes,
+        fk.foreignClass,
+        table,
+        fk
+      );
+
+      return maybeDeprecate(field, attr, `${fieldName}.nodeId`);
+    }
+
+    return field;
+  });
+
+  function maybeDeprecate<T extends GraphQLFieldConfig<any, any>>(
+    field: T,
+    attr: PgAttribute,
+    preferredField: string
+  ): T {
+    const condition =
+      typeof options.globalIdShouldDeprecate === "function"
+        ? options.globalIdShouldDeprecate(attr)
+        : options.globalIdShouldDeprecate;
+
+    const deprecationReason =
+      field.deprecationReason ||
+      (typeof options.globalIdDeprecationReason === "function"
+        ? options.globalIdDeprecationReason(preferredField)
+        : options.globalIdDeprecationReason);
+
+    return condition && deprecationReason
+      ? { ...field, deprecationReason }
+      : field;
+  }
 };
 
 const GlobalIdExtensionsPlugin = makePluginByCombiningPlugins(

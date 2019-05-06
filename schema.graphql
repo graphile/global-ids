@@ -347,7 +347,7 @@ type OrganizationsConnection {
   pageInfo: PageInfo!
 
   """The count of *all* `Organization` you could get from the connection."""
-  totalCount: Int
+  totalCount: Int!
 }
 
 """A `Organization` edge in the connection."""
@@ -631,9 +631,7 @@ input UserInput {
   name: String!
 }
 
-"""
-Represents an update to a `User`. Fields that are set will be updated.
-"""
+"""Represents an update to a `User`. Fields that are set will be updated."""
 input UserPatch {
   organizationId: Int
   uuid: UUID
@@ -654,7 +652,7 @@ type UsersConnection {
   pageInfo: PageInfo!
 
   """The count of *all* `User` you could get from the connection."""
-  totalCount: Int
+  totalCount: Int!
 }
 
 """A `User` edge in the connection."""

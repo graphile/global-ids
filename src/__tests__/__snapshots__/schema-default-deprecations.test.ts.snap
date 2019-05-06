@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Schema matches snapshot 1`] = `
+exports[`Schema matches snapshot - default deprecations 1`] = `
 "\\"\\"\\"All input for the create \`Item\` mutation.\\"\\"\\"
 input CreateItemInput {
   \\"\\"\\"
@@ -279,7 +279,7 @@ type Item implements Node {
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   \\"\\"\\"
   nodeId: ID!
-  id: Int!
+  id: Int! @deprecated(reason: \\"Prefer using the Relay global identifier property \`nodeId\` instead.\\")
   personOrganizationId: Int!
   personIdentifier: String!
   label: String!
@@ -319,9 +319,7 @@ input ItemInput {
   personByPersonOrganizationIdAndPersonIdentifier: ID
 }
 
-\\"\\"\\"
-Represents an update to a \`Item\`. Fields that are set will be updated.
-\\"\\"\\"
+\\"\\"\\"Represents an update to a \`Item\`. Fields that are set will be updated.\\"\\"\\"
 input ItemPatch {
   id: Int
   personOrganizationId: Int
@@ -345,7 +343,7 @@ type ItemsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Item\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Item\` edge in the connection.\\"\\"\\"
@@ -514,7 +512,7 @@ type Organization implements Node {
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   \\"\\"\\"
   nodeId: ID!
-  id: Int!
+  id: Int! @deprecated(reason: \\"Prefer using the Relay global identifier property \`nodeId\` instead.\\")
   name: String!
   createdAt: Datetime!
 
@@ -593,7 +591,7 @@ type OrganizationsConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Organization\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Organization\` edge in the connection.\\"\\"\\"
@@ -647,7 +645,7 @@ type PeopleConnection {
   pageInfo: PageInfo!
 
   \\"\\"\\"The count of *all* \`Person\` you could get from the connection.\\"\\"\\"
-  totalCount: Int
+  totalCount: Int!
 }
 
 \\"\\"\\"A \`Person\` edge in the connection.\\"\\"\\"
@@ -679,7 +677,7 @@ type Person implements Node {
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   \\"\\"\\"
   nodeId: ID!
-  organizationId: Int!
+  organizationId: Int! @deprecated(reason: \\"Prefer using the Relay global identifier property \`organizationByOrganizationId.nodeId\` instead.\\")
   identifier: String!
   name: String!
   createdAt: Datetime!
