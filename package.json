@@ -1,6 +1,6 @@
 {
   "name": "@graphile/global-ids",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Expands PostGraphile support for global object IDs",
   "main": "dist/index.js",
   "scripts": {
@@ -22,7 +22,11 @@
     "type": "git",
     "url": "git+https://github.com/graphile/global-ids.git"
   },
-  "keywords": ["PostGraphile", "plugin", "relay"],
+  "keywords": [
+    "PostGraphile",
+    "plugin",
+    "relay"
+  ],
   "author": "Benjie Gillam <code@benjiegillam.com>",
   "license": "MIT",
   "bugs": {
@@ -47,7 +51,10 @@
     "tslint-consistent-codestyle": "^1.15.1",
     "typescript": "^3.4.5"
   },
-  "files": ["dist/*.js*", "dist/*.ts*"],
+  "files": [
+    "dist/*.js*",
+    "dist/*.ts*"
+  ],
   "dependencies": {
     "graphile-utils": "^4.4.0"
   }
