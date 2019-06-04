@@ -42,6 +42,7 @@ function getNodeIdRelations(table: PgClass, build: any) {
       return {
         fieldName,
         constraint,
+        TableType,
         // tslint:disable-next-line: no-unnecessary-type-annotation
         fromNodeId(nodeId: string) {
           const { Type, identifiers } = nodeId
@@ -177,6 +178,7 @@ const GlobalIdExtensionsTweakFieldsPlugin: Plugin = (builder, config) => {
         [fk.fieldName]: fieldWithHooks(
           fk.fieldName,
           {
+            description: `The globally unique \`ID\` to be used in ${isPgCondition ? 'selecting' : 'specifying'} a single \`${fk.TableType.name}\`.`,
             type: GraphQLID,
           },
           {
