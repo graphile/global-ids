@@ -307,6 +307,7 @@ input ItemCondition {
 
   \\"\\"\\"Checks for equality with the object’s \`createdAt\` field.\\"\\"\\"
   createdAt: Datetime
+  personByPersonOrganizationIdAndPersonIdentifier: ID
 }
 
 \\"\\"\\"An input for mutations affecting \`Item\`\\"\\"\\"
@@ -730,6 +731,7 @@ input PersonCondition {
 
   \\"\\"\\"Checks for equality with the object’s \`createdAt\` field.\\"\\"\\"
   createdAt: Datetime
+  organizationByOrganizationId: ID
 }
 
 \\"\\"\\"An input for mutations affecting \`Person\`\\"\\"\\"
