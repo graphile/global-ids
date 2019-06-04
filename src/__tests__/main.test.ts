@@ -252,11 +252,11 @@ Object {
       schema,
       `
         query {
-          allItems(
-            condition: {
-              personByPersonOrganizationIdAndPersonIdentifier: "WyJwZW9wbGUiLDIsIjMiXQ=="
-            }
-          ) {
+          allItems(condition: {
+            personByPersonOrganizationIdAndPersonIdentifier: [
+              "WyJwZW9wbGUiLDIsIjMiXQ=="
+            ]
+          }) {
             nodes {
               personByPersonOrganizationIdAndPersonIdentifier {
                 nodeId

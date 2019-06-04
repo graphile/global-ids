@@ -1,10 +1,15 @@
 import { Plugin } from "graphile-build";
-import { PgConstraint, PgAttribute, PgClass, QueryBuilder } from "graphile-build-pg";
+import { PgConstraint, PgAttribute, PgClass, QueryBuilder, sql as SQL } from "graphile-build-pg";
 import {
   makePluginByCombiningPlugins,
   makeWrapResolversPlugin,
 } from "graphile-utils";
 import { GraphQLFieldConfig } from "graphql";
+
+const enum SqlOperator {
+  AND = ' AND ',
+  OR = ' OR ',
+}
 
 function isForeignKey(c: PgConstraint): boolean {
   return c.type === "f";
@@ -27,6 +32,7 @@ function getNodeIdRelations(table: PgClass, build: any) {
   return table.constraints
     .filter(isForeignKey)
     .map((constraint) => {
+      const sql: typeof SQL = build.pgSql;
       const foreignTable = constraint.foreignClass as PgClass;
       const TableType = build.pgGetGqlTypeByTypeIdAndModifier(
         foreignTable.type.id,
@@ -43,8 +49,8 @@ function getNodeIdRelations(table: PgClass, build: any) {
         fieldName,
         constraint,
         TableType,
-        // tslint:disable-next-line: no-unnecessary-type-annotation
-        fromNodeId(nodeId: string) {
+        // tslint:disable: no-unnecessary-type-annotation
+        fromSingleNodeId(nodeId: string) {
           const { Type, identifiers } = nodeId
             ? build.getTypeAndIdentifiersFromNodeId(nodeId)
             : { Type: TableType, identifiers: null };
@@ -62,7 +68,44 @@ function getNodeIdRelations(table: PgClass, build: any) {
               value,
             };
           });
+        },
+        fromNodeId(nodeId: string | Array<string>) {
+          if (nodeId === undefined) {
+            return [];
+          }
+
+          const nodeIds = Array.isArray(nodeId) ? nodeId : [ nodeId ];
+          return nodeIds.map(id => this.fromSingleNodeId(id));
+        },
+        sqlWhere(nodeId: string | Array<string>, builder: QueryBuilder) {
+          if (nodeId === undefined) {
+            return;
+          }
+
+          const alias = builder.getTableAlias();
+          const statements: Array<Array<SQL.SQLNode>> = [];
+
+          for (const relation of this.fromNodeId(nodeId)) {
+            let allNulls = true;
+
+            const clause = relation.map(({ columnName, value }) => {
+              allNulls = allNulls && value === null;
+              return sql.fragment`(${alias}.${sql.identifier(columnName)} = ${sql.value(value)})`;
+            });
+
+            statements.push(sql.join(
+              clause,
+              allNulls ? SqlOperator.OR : SqlOperator.AND,
+            ));
+          }
+
+          if (statements.length) {
+            builder.where(sql.join(statements, SqlOperator.OR));
+          }
+
+          return;
         }
+        // tslint:enable: no-unnecessary-type-annotation
       };
     });
 }
@@ -146,7 +189,7 @@ const GlobalIdExtensionsTweakFieldsPlugin: Plugin = (builder, config) => {
   ) {
     const {
       extend,
-      graphql: { GraphQLID },
+      graphql: { GraphQLID, GraphQLList },
     } = build;
     const {
       scope: {
@@ -179,7 +222,7 @@ const GlobalIdExtensionsTweakFieldsPlugin: Plugin = (builder, config) => {
           fk.fieldName,
           {
             description: `The globally unique \`ID\` to be used in ${isPgCondition ? 'selecting' : 'specifying'} a single \`${fk.TableType.name}\`.`,
-            type: GraphQLID,
+            type: isPgCondition ? new GraphQLList(GraphQLID) : GraphQLID,
           },
           {
             pgFieldIntrospection: fk.constraint,
@@ -195,9 +238,6 @@ const GlobalIdExtensionsTweakFieldsPlugin: Plugin = (builder, config) => {
     build,
     context
   ) {
-    const {
-      pgSql: sql,
-    } = build;
     const {
       scope: {
         isPgFieldConnection,
@@ -218,27 +258,8 @@ const GlobalIdExtensionsTweakFieldsPlugin: Plugin = (builder, config) => {
     addArgDataGenerator(function({ condition }: any) {
       return {
         pgQuery: (queryBuilder: QueryBuilder) => {
-          const alias = queryBuilder.getTableAlias();
           if (condition != null) {
-            foreignKeys
-              .forEach(fk => {
-                const nodeId = condition[fk.fieldName];
-
-                if (nodeId === null) {
-                  // TODO: implement special logic to query where any of the NodeID columns are null
-                  return;
-                }
-
-                if (nodeId === undefined) {
-                  return;
-                }
-
-                for (const identifier of fk.fromNodeId(nodeId)) {
-                  queryBuilder.where(
-                    sql.fragment`${alias}.${sql.identifier(identifier.columnName)} = ${sql.value(identifier.value)}`
-                  );
-                }
-              });
+            foreignKeys.forEach(fk => fk.sqlWhere(condition[fk.fieldName], queryBuilder));
           }
         },
       };
@@ -358,8 +379,8 @@ const GlobalIdExtensionsPlugin = makePluginByCombiningPlugins(
         // We're no longer used, so clean us up
         delete obj[fk.fieldName];
 
-        if (nodeId !== undefined) {
-          for (const identifier of fk.fromNodeId(nodeId)) {
+        for (const relation of fk.fromNodeId(nodeId)) {
+          for (const identifier of relation) {
             if (
               obj[identifier.fieldName] !== undefined &&
               obj[identifier.fieldName] !== identifier.value
