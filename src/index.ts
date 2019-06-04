@@ -224,6 +224,11 @@ const GlobalIdExtensionsTweakFieldsPlugin: Plugin = (builder, config) => {
               .forEach(fk => {
                 const nodeId = condition[fk.fieldName];
 
+                if (nodeId === null) {
+                  // TODO: implement special logic to query where any of the NodeID columns are null
+                  return;
+                }
+
                 if (nodeId === undefined) {
                   return;
                 }
