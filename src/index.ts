@@ -31,6 +31,7 @@ function containsColumn(c: PgConstraint, attr: PgAttribute): boolean {
 function getNodeIdRelations(table: PgClass, build: any) {
   return table.constraints
     .filter(isForeignKey)
+    .filter(c => !build.pgOmit(c, "filter"))
     .map((constraint) => {
       const sql: typeof SQL = build.pgSql;
       const foreignTable = constraint.foreignClass as PgClass;
