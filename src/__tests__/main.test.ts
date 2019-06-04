@@ -248,6 +248,51 @@ Object {
 }
 `);
 
+    const queryResult = await graphql(
+      schema,
+      `
+        query {
+          allItems(
+            condition: {
+              personByPersonOrganizationIdAndPersonIdentifier: "WyJwZW9wbGUiLDIsIjMiXQ=="
+            }
+          ) {
+            nodes {
+              personByPersonOrganizationIdAndPersonIdentifier {
+                nodeId
+                organizationId
+                identifier
+              }
+              personOrganizationId
+              personIdentifier
+              label
+            }
+          }
+        }
+      `,
+      null,
+      context,
+      {},
+      null
+    );
+    expect(queryResult.errors).toBeFalsy();
+    expect(queryResult.data).toBeTruthy();
+    const {
+      allItems: { nodes }
+    } = queryResult.data!;
+    expect(nodes[0]).toMatchInlineSnapshot(`
+Object {
+  "label": "Gadget",
+  "personByPersonOrganizationIdAndPersonIdentifier": Object {
+    "identifier": "3",
+    "nodeId": "WyJwZW9wbGUiLDIsIjMiXQ==",
+    "organizationId": 2,
+  },
+  "personIdentifier": "3",
+  "personOrganizationId": 2,
+}
+`);
+
     const unsetResult = await graphql(
       schema,
       `
