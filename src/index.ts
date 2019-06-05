@@ -6,13 +6,9 @@ import {
 } from "graphile-utils";
 import { GraphQLFieldConfig } from "graphql";
 
-const enum SqlOperator {
-  AND = ' AND ',
-  OR = ' OR ',
-}
-
 function isForeignKey(c: PgConstraint): boolean {
-  return c.type === "f";
+  const pk = c.foreignClass && c.foreignClass.primaryKeyConstraint;
+  return c.type === "f" && !!pk && pk.keyAttributes.every(a => c.foreignKeyAttributes.includes(a));
 }
 
 function containsSingleColumn(
@@ -28,10 +24,28 @@ function containsColumn(c: PgConstraint, attr: PgAttribute): boolean {
   return c.keyAttributes.includes(attr);
 }
 
-function getNodeIdRelations(table: PgClass, build: any) {
+interface OmitContext {
+  isPgCondition: boolean;
+  isPgBaseInput: boolean;
+  isPgPatch: boolean
+}
+
+type OmitAction = "filter" | "base" | "update" | "create";
+
+function toOmitAction({ isPgCondition, isPgBaseInput, isPgPatch }: OmitContext): OmitAction {
+  return isPgCondition
+    ? "filter"
+    : isPgBaseInput
+      ? "base"
+      : isPgPatch ? "update" : "create";
+}
+
+function getNodeIdRelations(table: PgClass, build: any, context?: OmitContext) {
+  const action = context ? toOmitAction(context) : "filter";
+
   return table.constraints
     .filter(isForeignKey)
-    .filter(c => !build.pgOmit(c, "filter"))
+    .filter(c => !build.pgOmit(c, action))
     .map((constraint) => {
       const sql: typeof SQL = build.pgSql;
       const foreignTable = constraint.foreignClass as PgClass;
@@ -63,9 +77,12 @@ function getNodeIdRelations(table: PgClass, build: any) {
 
           return constraint.keyAttributes.map((attr, i) => {
             const value = identifiers && identifiers[i];
+            // const foreignAttr = constraint.foreignKeyAttributes[i];
             return {
               columnName: attr.name,
               fieldName: build.inflection.column(attr) as string,
+              // foreignColumnName: foreignAttr.name,
+              // foreignFieldName: build.inflection.column(foreignAttr),
               value,
             };
           });
@@ -79,32 +96,35 @@ function getNodeIdRelations(table: PgClass, build: any) {
           return nodeIds.map(id => this.fromSingleNodeId(id));
         },
         sqlWhere(nodeId: string | Array<string>, builder: QueryBuilder) {
-          if (nodeId === undefined) {
+          const parsed = this.fromNodeId(nodeId);
+
+          if (parsed.length === 0) {
             return;
           }
 
-          const alias = builder.getTableAlias();
-          const statements: Array<Array<SQL.SQLNode>> = [];
+          const localColumns = parsed[0].map(p => sql.identifier(p.columnName));
 
-          for (const relation of this.fromNodeId(nodeId)) {
-            let allNulls = true;
+          const values = parsed.reduce((memo, relation) => {
+            const tuple = relation.map(({ value }) => sql.value(value));
+            memo.push(sql.fragment`(${sql.join(tuple, ',')})`);
+            return memo;
+          }, [] as Array<Array<SQL.SQLNode>>);
 
-            const clause = relation.map(({ columnName, value }) => {
-              allNulls = allNulls && value === null;
-              return sql.fragment`(${alias}.${sql.identifier(columnName)} = ${sql.value(value)})`;
-            });
+          builder.where(sql.fragment`
+            (${sql.join(localColumns, ',')}) IN (${sql.join(values, ',')})
+          `);
 
-            statements.push(sql.join(
-              clause,
-              allNulls ? SqlOperator.OR : SqlOperator.AND,
-            ));
-          }
+          // TODO: this plugin is currently restricted to FK relations based on PKs
+          //   in the future, lifting this constraint will require more sophisticated
+          //   query building a la:
 
-          if (statements.length) {
-            builder.where(sql.join(statements, SqlOperator.OR));
-          }
-
-          return;
+          // builder.where(sql.fragment`
+          //   (${sql.join(localColumns, ',')}) IN (
+          //     SELECT ${sql.join(remoteColumns, ',')}
+          //     FROM ${sql.identifier(this.TableType.name)}
+          //     WHERE ${sql.join(remotePKColumns, ',')} IN (${sql.join(values, ',')})
+          //   )
+          // `);
         }
         // tslint:enable: no-unnecessary-type-annotation
       };
@@ -190,7 +210,7 @@ const GlobalIdExtensionsTweakFieldsPlugin: Plugin = (builder, config) => {
   ) {
     const {
       extend,
-      graphql: { GraphQLID, GraphQLList },
+      graphql: { GraphQLID, GraphQLList, GraphQLNonNull },
     } = build;
     const {
       scope: {
@@ -217,13 +237,17 @@ const GlobalIdExtensionsTweakFieldsPlugin: Plugin = (builder, config) => {
       return fields;
     }
 
-    return getNodeIdRelations(table, build).reduce((memo, fk) =>
+    return getNodeIdRelations(table, build, {
+      isPgBaseInput,
+      isPgCondition,
+      isPgPatch,
+    }).reduce((memo, fk) =>
       extend(memo, {
         [fk.fieldName]: fieldWithHooks(
           fk.fieldName,
           {
             description: `The globally unique \`ID\` to be used in ${isPgCondition ? 'selecting' : 'specifying'} a single \`${fk.TableType.name}\`.`,
-            type: isPgCondition ? new GraphQLList(GraphQLID) : GraphQLID,
+            type: isPgCondition ? new GraphQLList(new GraphQLNonNull(GraphQLID)) : GraphQLID,
           },
           {
             pgFieldIntrospection: fk.constraint,
