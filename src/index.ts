@@ -40,14 +40,87 @@ function toOmitAction({ isPgCondition, isPgBaseInput, isPgPatch }: OmitContext):
       : isPgPatch ? "update" : "create";
 }
 
+function buildNodeIdRelation(build: any, fieldName: string, constraint: PgConstraint, TableType: any) {
+  const sql: typeof SQL = build.pgSql;
+
+  return {
+    fieldName,
+    constraint,
+    TableType,
+    isPrimaryKey: constraint.type === 'p',
+    // tslint:disable: no-unnecessary-type-annotation
+    fromSingleNodeId(nodeId: string) {
+      const { Type, identifiers } = nodeId
+        ? build.getTypeAndIdentifiersFromNodeId(nodeId)
+        : { Type: TableType, identifiers: null };
+
+      if (Type !== TableType) {
+        // TODO: error?
+        return [];
+      }
+
+      return constraint.keyAttributes.map((attr, i) => {
+        const value = identifiers && identifiers[i];
+        // const foreignAttr = constraint.foreignKeyAttributes[i];
+        return {
+          columnName: attr.name,
+          fieldName: build.inflection.column(attr) as string,
+          // foreignColumnName: foreignAttr.name,
+          // foreignFieldName: build.inflection.column(foreignAttr),
+          value,
+        };
+      });
+    },
+    fromNodeId(nodeId: string | Array<string>) {
+      if (nodeId === undefined) {
+        return [];
+      }
+
+      const nodeIds = Array.isArray(nodeId) ? nodeId : [ nodeId ];
+      return nodeIds.map(id => this.fromSingleNodeId(id));
+    },
+    sqlWhere(nodeId: string | Array<string>, builder: QueryBuilder) {
+      const parsed = this.fromNodeId(nodeId);
+
+      if (parsed.length === 0) {
+        return;
+      }
+
+      const localColumns = parsed[0].map(p => sql.identifier(p.columnName));
+
+      const values = parsed.reduce((memo, relation) => {
+        const tuple = relation.map(({ value }) => sql.value(value));
+        memo.push(sql.fragment`(${sql.join(tuple, ',')})`);
+        return memo;
+      }, [] as Array<Array<SQL.SQLNode>>);
+
+      builder.where(sql.fragment`
+        (${sql.join(localColumns, ',')}) IN (${sql.join(values, ',')})
+      `);
+
+      // TODO: this plugin is currently restricted to FK relations based on PKs
+      //   in the future, lifting this constraint will require more sophisticated
+      //   query building a la:
+
+      // builder.where(sql.fragment`
+      //   (${sql.join(localColumns, ',')}) IN (
+      //     SELECT ${sql.join(remoteColumns, ',')}
+      //     FROM ${sql.identifier(this.TableType.name)}
+      //     WHERE ${sql.join(remotePKColumns, ',')} IN (${sql.join(values, ',')})
+      //   )
+      // `);
+    }
+    // tslint:enable: no-unnecessary-type-annotation
+  };
+}
+
 function getNodeIdRelations(table: PgClass, build: any, context?: OmitContext) {
   const action = context ? toOmitAction(context) : "filter";
 
-  return table.constraints
+  const constraints = table.constraints
     .filter(isForeignKey)
     .filter(c => !build.pgOmit(c, action))
     .map((constraint) => {
-      const sql: typeof SQL = build.pgSql;
       const foreignTable = constraint.foreignClass as PgClass;
       const TableType = build.pgGetGqlTypeByTypeIdAndModifier(
         foreignTable.type.id,
@@ -60,75 +133,20 @@ function getNodeIdRelations(table: PgClass, build: any, context?: OmitContext) {
         constraint
       );
 
-      return {
-        fieldName,
-        constraint,
-        TableType,
-        // tslint:disable: no-unnecessary-type-annotation
-        fromSingleNodeId(nodeId: string) {
-          const { Type, identifiers } = nodeId
-            ? build.getTypeAndIdentifiersFromNodeId(nodeId)
-            : { Type: TableType, identifiers: null };
-
-          if (Type !== TableType) {
-            // TODO: error?
-            return [];
-          }
-
-          return constraint.keyAttributes.map((attr, i) => {
-            const value = identifiers && identifiers[i];
-            // const foreignAttr = constraint.foreignKeyAttributes[i];
-            return {
-              columnName: attr.name,
-              fieldName: build.inflection.column(attr) as string,
-              // foreignColumnName: foreignAttr.name,
-              // foreignFieldName: build.inflection.column(foreignAttr),
-              value,
-            };
-          });
-        },
-        fromNodeId(nodeId: string | Array<string>) {
-          if (nodeId === undefined) {
-            return [];
-          }
-
-          const nodeIds = Array.isArray(nodeId) ? nodeId : [ nodeId ];
-          return nodeIds.map(id => this.fromSingleNodeId(id));
-        },
-        sqlWhere(nodeId: string | Array<string>, builder: QueryBuilder) {
-          const parsed = this.fromNodeId(nodeId);
-
-          if (parsed.length === 0) {
-            return;
-          }
-
-          const localColumns = parsed[0].map(p => sql.identifier(p.columnName));
-
-          const values = parsed.reduce((memo, relation) => {
-            const tuple = relation.map(({ value }) => sql.value(value));
-            memo.push(sql.fragment`(${sql.join(tuple, ',')})`);
-            return memo;
-          }, [] as Array<Array<SQL.SQLNode>>);
-
-          builder.where(sql.fragment`
-            (${sql.join(localColumns, ',')}) IN (${sql.join(values, ',')})
-          `);
-
-          // TODO: this plugin is currently restricted to FK relations based on PKs
-          //   in the future, lifting this constraint will require more sophisticated
-          //   query building a la:
-
-          // builder.where(sql.fragment`
-          //   (${sql.join(localColumns, ',')}) IN (
-          //     SELECT ${sql.join(remoteColumns, ',')}
-          //     FROM ${sql.identifier(this.TableType.name)}
-          //     WHERE ${sql.join(remotePKColumns, ',')} IN (${sql.join(values, ',')})
-          //   )
-          // `);
-        }
-        // tslint:enable: no-unnecessary-type-annotation
-      };
+      return buildNodeIdRelation(build, fieldName, constraint, TableType);
     });
+
+    const pk = table.primaryKeyConstraint;
+
+    if ((!context || context.isPgCondition) && pk && !build.pgOmit(pk, action)) {
+      const TableType = build.pgGetGqlTypeByTypeIdAndModifier(
+        table.type.id,
+        null
+      );
+      constraints.push(buildNodeIdRelation(build, 'nodeId', pk, TableType));
+    }
+
+    return constraints;
 }
 
 // Find the relevant input types:
@@ -191,7 +209,7 @@ const GlobalIdExtensionsTweakFieldsPlugin: Plugin = (builder, config) => {
 
       // If this field belongs to a foreign key, mark it nullable.
       if (
-        foreignKeys.some(f => containsColumn(f.constraint, attr))
+        foreignKeys.some(f => !f.isPrimaryKey && containsColumn(f.constraint, attr))
       ) {
         return {
           ...field,
@@ -311,16 +329,16 @@ const GlobalIdExtensionsTweakFieldsPlugin: Plugin = (builder, config) => {
     const attr: PgAttribute = pgFieldIntrospection;
     const table = attr.class;
 
-    if (containsSingleColumn(table.primaryKeyConstraint, attr)) {
-      return maybeDeprecate(field, attr, "nodeId");
-    }
-
     const fk = getNodeIdRelations(table, build).find(
       f => containsSingleColumn(f.constraint, attr)
     );
 
     if (fk) {
-      return maybeDeprecate(field, attr, `${fk.fieldName}.nodeId`);
+      return maybeDeprecate(field, attr,
+        fk.constraint === table.primaryKeyConstraint
+          ? fk.fieldName
+          : `${fk.fieldName}.nodeId`
+      );
     }
 
     return field;
