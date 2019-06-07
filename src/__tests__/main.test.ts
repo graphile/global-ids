@@ -233,7 +233,7 @@ Object {
     expect(updateResult.errors).toBeFalsy();
     expect(updateResult.data).toBeTruthy();
     const {
-      updateItem: { item: updatedItem },
+      updateItem: { item: updatedItem }
     } = updateResult.data!;
     expect(updatedItem).toMatchInlineSnapshot(`
 Object {
@@ -246,6 +246,54 @@ Object {
   "personIdentifier": "3",
   "personOrganizationId": 2,
 }
+`);
+
+    const queryResult = await graphql(
+      schema,
+      `
+        query {
+          allItems(condition: {
+            personByPersonOrganizationIdAndPersonIdentifier: [
+              "WyJwZW9wbGUiLDIsIjMiXQ=="
+              "WyJwZW9wbGUiLDIsIjIiXQ=="
+            ]
+          }) {
+            nodes {
+              personByPersonOrganizationIdAndPersonIdentifier {
+                nodeId
+                organizationId
+                identifier
+              }
+              personOrganizationId
+              personIdentifier
+              label
+            }
+          }
+        }
+      `,
+      null,
+      context,
+      {},
+      null
+    );
+    expect(queryResult.errors).toBeFalsy();
+    expect(queryResult.data).toBeTruthy();
+    const {
+      allItems: { nodes }
+    } = queryResult.data!;
+    expect(nodes).toMatchInlineSnapshot(`
+Array [
+  Object {
+    "label": "Gadget",
+    "personByPersonOrganizationIdAndPersonIdentifier": Object {
+      "identifier": "3",
+      "nodeId": "WyJwZW9wbGUiLDIsIjMiXQ==",
+      "organizationId": 2,
+    },
+    "personIdentifier": "3",
+    "personOrganizationId": 2,
+  },
+]
 `);
 
     const unsetResult = await graphql(
