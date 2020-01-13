@@ -55,6 +55,10 @@
     "dist/*.js*",
     "dist/*.ts*"
   ],
+  "prettier": {
+    "trailingComma": "es5",
+    "proseWrap": "always"
+  },
   "dependencies": {
     "graphile-utils": "^4.4.0"
   }
