@@ -71,6 +71,8 @@ const GlobalIdExtensionsTweakFieldsPlugin: Plugin = (builder, config) => {
       if (
         !isPgRowType ||
         !isInputType ||
+        !pgIntrospection ||
+        !pgFieldIntrospection ||
         pgIntrospection.kind !== "class" ||
         pgFieldIntrospection.kind !== "attribute"
       ) {
@@ -117,6 +119,7 @@ const GlobalIdExtensionsTweakFieldsPlugin: Plugin = (builder, config) => {
     if (
       !isPgRowType ||
       !(isInputType || isPgPatch || isPgBaseInput) ||
+      !pgIntrospection ||
       pgIntrospection.kind !== "class"
     ) {
       return fields;
