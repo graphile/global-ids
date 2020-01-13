@@ -1,6 +1,6 @@
 {
   "name": "@graphile/global-ids",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Expands PostGraphile support for global object IDs",
   "main": "dist/index.js",
   "scripts": {
